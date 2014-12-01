@@ -19,7 +19,7 @@
                         <td style="width: 20%">
                             <img src="/img/plomeria_selecta_logo.jpeg"></td>
                         <td style="width: 80%" align=center>
-                            <p style="color: #04b9db">Portal RFID</p></td>
+                            <p style="color: #04b9db">Dominio Portal RFID</p></td>
                         <td style="width: 20%" >
                             <img src="/img/grupo_hqh_logo.png"></td>
                     </tr>
