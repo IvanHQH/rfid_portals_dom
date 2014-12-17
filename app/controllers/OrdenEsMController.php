@@ -18,12 +18,20 @@ class OrdenEsMController extends BaseController{
 	 * @return Response
 	 */
     
-	public function index()
+	public function getIndex()
 	{
             $ordern_es_ms = array();
             $ordern_es_ms = OrdenEsM::all();
-            return Response::json($ordern_es_ms);
+            return View::make('OrdenesMTemplate',['ordern_es_ms' => $ordern_es_ms]);
+            //return Response::json($ordern_es_ms);
 	}
+        
+        public function getIndexData()
+        {
+            $ordern_es_ms = array();
+            $ordern_es_ms = OrdenEsM::all();
+            return Response::json($ordern_es_ms);
+        }
         
 	/**
 	 *fet
@@ -39,7 +47,7 @@ class OrdenEsMController extends BaseController{
         public function showread()
         {   
             $step = 'start';
-            return View::make('ReadTemplate',['step' => $step]);
+            return View::make('PortalTemplate',['step' => $step]);
         }        
         
         public function writeJsonFolio()
@@ -81,20 +89,20 @@ class OrdenEsMController extends BaseController{
 	 * Store a newly created resource in storage.
 	 *
 	 * @return Response
-	 */        
+	 */
 	public function store()
 	{         
             $idPending = OrdenEsM::idPending();           
             if($idPending == -1){
                 $input = Input::All();
-                $ordenM = new OrdenEsM();                        
+                $ordenM = new OrdenEsM();                     
                 $ordenM->customer_id = $input['customer_id'];
                 $ordenM->folio = $input['folio'];
                 $ordenM->type = $input['type'];
                 $ordenM->pending = $input['pending'];
                 $ordenM->created_at = $input['created_at'];
                 $ordenM->updated_at = $input['updated_at'];
-                $ordenM->save();                
+                $ordenM->save();
                 return "yes save";
             }
             return "no save";

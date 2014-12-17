@@ -32,9 +32,10 @@
             <div class="col-sm-3 col-md-2 sidebar">
                 <h3 class="sub-header">Principal</h3>
                 <ul class="nav nav-sidebar">
-                    <li id="menu_dashboard"><a href="/showread">Lectura tags</a></li>
+                    <li id="menu_dashboard"><a href="/showread">Lectura Portal</a></li>
+                    <li id="menu_ordenesm"><a href="/ordenesm">Lecturas</a></li>
                     <li id="menu_logs"><a href="/logs">Resgistros</a></li>
-                </ul>
+                </ul>              
                 <h3 class="sub-header">Antenas</h3>
                 <ul class="nav nav-sidebar" style="padding-left: 20px">
                     <li id="antena_1">
@@ -56,6 +57,7 @@
     </div>    
     {{-- jQuery (necessary for Bootstrap's JavaScript plugins) --}}
     <script src="//code.jquery.com/jquery.js"></script>
+    @yield('scripts')
     {{-- Include all compiled plugins (below), or include individual files as needed --}}
     {{ HTML::script('assets/js/jquery.min.js') }}
     {{ HTML::script('assets/js/bootstrap.min.js') }}

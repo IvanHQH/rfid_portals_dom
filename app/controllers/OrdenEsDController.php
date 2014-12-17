@@ -27,11 +27,17 @@ class OrdenEsDController extends BaseController {
             return Response::json($ordern_es_ds);
 	}   
         
-        public function row_data()
+        public function row_data_pending()
         {
             $ordenM = OrdenEsD::UPCFolioNotEnd(); 
             return Response::json($ordenM);
         }
+
+        public function row_data($idOrdenM)
+        {
+            $ordenM = OrdenEsD::UPCFolio($idOrdenM); 
+            return Response::json($ordenM);
+        }        
         
 	/**
 	 *fet
@@ -71,11 +77,23 @@ class OrdenEsDController extends BaseController {
 	 * @return Response
 	 */
 	public function show($id)
-	{
-            $tags = OrdenEsD::where('orden_es_m_id',$id)->get();
-            return Response::json($tags);
+	{            
+            /*$tags = OrdenEsD::where('orden_es_m_id',$id)->get();
+            return Response::json($tags);*/
+            /*$tags = OrdenEsD::where('orden_es_m_id',$id)->get();
+            return View::make('OrdenDTemplate',['customers' => $tags]);*/
+            return View::make('OrdenDTemplate',['id' => $id]);
 	}
-        
+        /*
+	public function show($id)
+	{            
+            /*$tags = OrdenEsD::where('orden_es_m_id',$id)->get();
+            return Response::json($tags);*/
+            /*$tags = OrdenEsD::where('orden_es_m_id',$id)->get();
+            return View::make('OrdenDTemplate',['customers' => $tags]);
+            return View::make('OrdenDTemplate',['id' => $id]);
+	}        
+        */
 	/**
 	 * Show the form for editing the specified resource.
 	 *
@@ -125,7 +143,7 @@ class OrdenEsDController extends BaseController {
                 {
                     $customer = Customer::where('name',
                         Input::get('nameCustomer'))->get()[0];                    
-                    return View::make('ReadTemplate',
+                    return View::make('PortalTemplate',
                         ['customer' => $customer,'step' => "start"]);
                 }                    
             }                
@@ -143,16 +161,16 @@ class OrdenEsDController extends BaseController {
                 $read->value = "1";
                 $read->save();
             }
-            return View::make('ReadTemplate',['step' => 'show_read']);
+            return View::make('PortalTemplate',['step' => 'show_read']);
         }
         
         public function show_read()
         {
             $idPending = OrdenEsM::idPending();
             if($idPending > 0)
-                return View::make('ReadTemplate',['step' => 'check']);
+                return View::make('PortalTemplate',['step' => 'check']);
             else
-                return View::make('ReadTemplate',['step' => 'show_read']);
+                return View::make('PortalTemplate',['step' => 'show_read']);
         }           
         
         public function checkfolio()
@@ -175,10 +193,10 @@ class OrdenEsDController extends BaseController {
                 else{
                     $messages[0] = "no hay lecturas de tags";
                 }
-                return View::make('ReadTemplate',['messages' => $messages]);  
+                return View::make('PortalTemplate',['messages' => $messages]);  
             }
             else{
-                return View::make('ReadTemplate',['step' => "check"]);
+                return View::make('PortalTemplate',['step' => "check"]);
             }            
         }       
         

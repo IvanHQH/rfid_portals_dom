@@ -21,6 +21,12 @@ class OrdenEsD extends BaseModel{
 
     public static function UPCFolioNotEnd(){
         $idOrderM = OrdenEsM::idPending();
+        $folio = OrdenEsD::UPCFolio($idOrderM);
+        return $folio;
+    }    
+    
+    public static function UPCFolio($idOrderM)
+    {
         $ordersD = OrdenEsD::where('orden_es_m_id',$idOrderM)->get();
         $i = 0;
         $folio = array();
@@ -50,7 +56,7 @@ class OrdenEsD extends BaseModel{
             }
         }
         return $folio;        
-    }    
+    }
     
     public static function jsonTagsToUpcs($ordersD){
         //$json_string = file_get_contents($this->pathPublic.'/readstags.json');
