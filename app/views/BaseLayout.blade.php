@@ -14,17 +14,22 @@
     <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div class="container-fluid">
             <div class="navbar-header">
-                <table style="width: 100%">
-                    <tr style="width: 100%">
-                        <td style="width: 20%">
-                            <img src="/img/plomeria_selecta_logo.jpeg"></td>
-                        <td style="width: 80%" align=center>
-                            <p style="color: #04b9db">Dominio Portal RFID</p></td>
-                        <td style="width: 20%" >
-                            <img src="/img/grupo_hqh_logo.png"></td>
-                    </tr>
-                </table>
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <img src="/img/grupo_hqh_logo.png"></td>
             </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">                                        
+                    <li id="menu_dashboard"><a href="/showread">Lectura Portal</a></li>
+                    <li id="menu_ordenesm"><a href="/ordenesm">Lecturas</a></li>
+                    <li id="menu_logs"><a href="/logs">Comparesiones</a></li>  
+                    <li id="menu_logout"><a href="/logout">Cerrar Sesión</a></li>
+                </ul>
+            </div>            
         </div>
     </div>    
     <div class="container-fluid">
@@ -34,7 +39,7 @@
                 <ul class="nav nav-sidebar">
                     <li id="menu_dashboard"><a href="/showread">Lectura Portal</a></li>
                     <li id="menu_ordenesm"><a href="/ordenesm">Lecturas</a></li>
-                    <li id="menu_logs"><a href="/logs">Resgistros</a></li>
+                    <li id="menu_logs"><a href="/logs">Comparesiones</a></li>
                 </ul>              
                 <h3 class="sub-header">Antenas</h3>
                 <ul class="nav nav-sidebar" style="padding-left: 20px">
@@ -47,6 +52,10 @@
                         <img src="/img/antena_rfid_mini.png"/>2</button>
                     </li>                                        
                 </ul>
+                <h3 class="sub-header">Usuario</h3>
+                <ul class="nav nav-sidebar">
+                    <li id="menu_logout"><a href="/logout">Cerrar Sesión</a></li>
+                </ul> 
             </div>
             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                 <div class="box">

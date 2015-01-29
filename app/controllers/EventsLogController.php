@@ -21,27 +21,30 @@ class EventsLogController extends BaseController {
     
     /**
     *post
-     * Store a newly created resource in storage.
-     *
-     * @return Response
+     * save log handheld
      */
     public function store()
-    {     
-        $hour = new DateTime('now');
-        $customer = new Customer();
-        $customer->name = Input::get('customerName');
-        $customer->logo = Input::get('Logo');
-        $customer->created_at = $hour;
-        $customer->updated_at = $hour;
-        $customer->save();
-        return Redirect::to('/login');
+    {    
+        $id = OrdenEsM::idLastFolio(Input::get('folio'),Input::get('cretaed_at'));        
+        {                
+            $log = new EventsLog();
+            $log->event_id = $id;
+            $log->user_id = Input::get('user_id');
+            $log->type = Input::get('type');
+            $log->description = Input::get('description');
+            $log->created_at = Input::get('created_at');
+            $log->updated_at = Input::get('updated_at');
+            $log->customer_id = Input::get('customer_id');
+            $log->save();
+        }        
     }    
     
     public function rows_data()
     {
         $logs = array();
         $i = 0;
-        foreach (EventsLog::with('User')->orderBy('id', 'desc')->get() as $log)
+        foreach (EventsLog::with('User')->where('customer_id',Auth::user()->customer_id)
+                ->orderBy('id', 'desc')->get() as $log)
         {
             $newlog = new EventsLog();
             $newlog->name = $log->user->name;

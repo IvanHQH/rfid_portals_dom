@@ -21,9 +21,8 @@ class OrdenEsMController extends BaseController{
 	public function getIndex()
 	{
             $ordern_es_ms = array();
-            $ordern_es_ms = OrdenEsM::all();
+            $ordern_es_ms = OrdenEsM::indexAllForViewLayout();
             return View::make('OrdenesMTemplate',['ordern_es_ms' => $ordern_es_ms]);
-            //return Response::json($ordern_es_ms);
 	}
         
         public function getIndexData()
@@ -71,17 +70,6 @@ class OrdenEsMController extends BaseController{
             }else{
                 fwrite($fp, $ordenM);
             }
-            /*$json_string = file_get_contents("/home/developer/Projects/RFID/laravel/public/readsupcs.json");
-            $ordersD = json_decode($json_string);
-            //$folioUpcs = OrdenEsD::jsonTagsToUpcs($ordersD);
-            return Response::json($ordersD);
-            /*$data_to_file_json = json_encode($folioUpcs);
-            $fp = fopen("/home/developer/Projects/RFID/laravel/public/readsupcs.json","w+"); 
-            if($fp == false) { 
-               die("No se ha podido crear el archivo."); 
-            }else{
-                fwrite($fp, $data_to_file_json);
-            }       */
         }       
         
 	/**
@@ -91,12 +79,15 @@ class OrdenEsMController extends BaseController{
 	 * @return Response
 	 */
 	public function store()
-	{         
+	{                     
             $idPending = OrdenEsM::idPending();           
-            if($idPending == -1){
+            $handheld = isset($input['handheld']) ? (int) $input['handheld'] : 0;
+            if($idPending == -1 || $handheld == 1){
                 $input = Input::All();
                 $ordenM = new OrdenEsM();                     
+                //$ordenM->customer_id = Auth::user()->customer_id;
                 $ordenM->customer_id = $input['customer_id'];
+                $ordenM->warehouse_id = $input['warehouse_id'];
                 $ordenM->folio = $input['folio'];
                 $ordenM->type = $input['type'];
                 $ordenM->pending = $input['pending'];
@@ -105,33 +96,24 @@ class OrdenEsMController extends BaseController{
                 $ordenM->save();
                 return "yes save";
             }
-            return "no save";
-            /*$idPending = OrdenEsM::idPending();           
-            if($idPending == -1){
-                $input = Input::All();
-                $ordenM = new OrdenEsM();                        
-                $ordenM->customer_id = $input['customer_id'];
-                $ordenM->folio = $input['folio'];
-                $ordenM->type = $input['type'];
-                $ordenM->pending = $input['pending'];
-                $ordenM->created_at = $input['created_at'];
-                $ordenM->updated_at = $input['updated_at'];
-                $ordenM->save();                
-                return "yes insert";
-            }
-            elseif($idPending > 0)
-            {
-                $input = Input::All();
-                $ordenM = new OrdenEsM(); 
-                $ordenM->id = $idPending;
-                $ordenM->created_at = $input['created_at'];
-                $ordenM->updated_at = $input['updated_at'];
-                $ordenM->save();                
-                return "yes update";
-            }
-            return "no";  */         
+            return "no save";       
 	}
 
+	public function storeHandheld()
+	{         
+            $input = Input::All();
+            $ordenM = new OrdenEsM();                     
+            $ordenM->customer_id = $input['customer_id'];
+            $ordenM->warehouse_id = $input['warehouse_id'];
+            $ordenM->folio = $input['folio'];
+            $ordenM->type = $input['type'];
+            $ordenM->pending = $input['pending'];
+            $ordenM->created_at = $input['created_at'];
+            $ordenM->updated_at = $input['updated_at'];
+            $ordenM->save();
+            return "yes save";      
+	}        
+        
 	/**
 	 * Display the specified resource.
 	 *

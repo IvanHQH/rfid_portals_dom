@@ -1,18 +1,18 @@
 @extends ('CustomerLayout')
 
 @section('content')
-<div class="container"> 
+<div class="container">     
     <div id="loginbox" style="margin-top:50px;" 
          class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">                    
         <div class="panel panel-info" >
             <div class="panel-heading">
                 <div class="panel-title">Iniciar sesión</div>
-            </div>     
+            </div>
             <div style="padding-top:30px" class="panel-body" >
                 <div style="display:none" id="login-alert" class="alert 
                      alert-danger col-sm-12"></div>
-                <form id="loginform" class="form-horizontal" role="form"
-                      method="get" action="/log_show_read">
+                {{Form::open(array('url' => 'login',
+                            'method'=>'post','class'=>'form-horizontal'))}}
                     <div style="margin-bottom: 25px" class="input-group">
                         <span class="input-group-addon"><i 
                                 class="glyphicon glyphicon-user"></i></span>
@@ -31,7 +31,7 @@
                                 class="form-control" style="float:right">
                             @foreach($customers as $customer)
                                 <option>{{$customer->name}}</option>
-                            @endforeach                                 
+                            @endforeach                               
                         </select>                            
                     </div>                        
                     <div style="margin-top:10px" class="form-group">
@@ -52,7 +52,7 @@
                             </div>
                         </div>
                     </div>    
-                </form>     
+                {{ Form::close() }}
             </div>                     
         </div>  
     </div>        

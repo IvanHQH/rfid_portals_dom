@@ -12,7 +12,7 @@
                     <tr>
                         <th  data-align="center">UPC's</th>                        
                         <th  data-align="center" data-sortable="true">Fecha/Hora</th>
-                        <th  data-align="left" data-sortable="true">Cliente</th>
+                        <!--th  data-align="left" data-sortable="true">Cliente</th-->
                         <th  data-align="left" data-sortable="true">Folio</th>
                         <th  data-align="center" data-sortable="true">Tipo</th>
                     </tr>
@@ -26,7 +26,7 @@
 			{{ Form::close() }}                            
                         </td>
                         <td>{{$order->created_at}}</td>
-                        <td>{{$order->customer_id}}</td>
+                        <!--td>{{$order->customer_id}}</td-->
                         <td>{{$order->folio}}</td>
                         <td>{{$order->type}}</td>
                     </tr>

@@ -14,7 +14,7 @@
                       action="/read/show_read">             
                 @elseif ($step == 'check')
                 <form class="navbar-form navbar-left" role="form" method="post"
-                      action="/checkfolio">
+                      action="/read/checkfolio">
                 @endif           
                   @if ($step == 'check')
                   <div class="form-group">
@@ -36,7 +36,13 @@
                     {{$customer->name}}
                 @endif                
             </td>
-            <td style="width: 27%" align="center">Miercoles 12 de Noviembre del 2014</td>
+            <td style="width: 27%" align="right">
+                <form role="form" method="get" action="/reset_read"> 
+                    <button type="submit" class="btn btn-default">
+                        Reset
+                    </button>                    
+                </form>        
+            </td>
         </tr>
     </table>    
     <div class="content-container">        

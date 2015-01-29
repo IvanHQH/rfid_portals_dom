@@ -7,21 +7,17 @@
  */
 
 /**
- * Description of UPCFolio
+ * Description of RespProducts
  *
  * @author Arellano
  */
-class UPCFolio {
-    //put your code here
-    var $upc;
-    var $quantity;
+class RespProduct {
     var $name;
+    var $quantity;
     
-    function UPCFolio($upc,$name,$folio)
+    function RespProduct($name,$quantity)
     {
-        $this->upc = $upc;
-        $this->quantity = $folio;
+        $this->quantity = $quantity;
         $this->name = $name;
-    }
-      
+    }    
 }

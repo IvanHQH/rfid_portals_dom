@@ -11,8 +11,7 @@
  *
  * @author Arellano
  */
-class OrdenEsDController extends BaseController {
-        var $pathPublic = "/home/developer/Projects/RFID/laravel/public";
+class OrdenEsDController extends BaseController {        
     
 	/**
 	 * Display a listing of the resource.
@@ -77,12 +76,11 @@ class OrdenEsDController extends BaseController {
 	 * @return Response
 	 */
 	public function show($id)
-	{            
-            /*$tags = OrdenEsD::where('orden_es_m_id',$id)->get();
-            return Response::json($tags);*/
-            /*$tags = OrdenEsD::where('orden_es_m_id',$id)->get();
-            return View::make('OrdenDTemplate',['customers' => $tags]);*/
-            return View::make('OrdenDTemplate',['id' => $id]);
+	{                        
+            $ordenm = OrdenEsM::find($id);                    
+            $ordenesd = OrdenEsD::UPCFolio($id); 
+            //return Response::json($ordenesd);
+            return View::make('OrdenDTemplate',['ordenesd' => $ordenesd,'folio' => $ordenm->folio]);
 	}
         /*
 	public function show($id)
@@ -128,26 +126,6 @@ class OrdenEsDController extends BaseController {
 
 	}
         
-        public function log_show_read()
-        {   
-            if(User::where('name',Input::get('name'))->
-                where('password',Input::get('password'))->count() == 0 )
-            {
-                $customers = array();
-                $customers = Customer::all();
-                return View::make('CustomerTemplate',['customers' => $customers]);
-            }
-            else
-            {
-                if(Customer::where('name',Input::get('nameCustomer'))->count() > 0)
-                {
-                    $customer = Customer::where('name',
-                        Input::get('nameCustomer'))->get()[0];                    
-                    return View::make('PortalTemplate',
-                        ['customer' => $customer,'step' => "start"]);
-                }                    
-            }                
-        }       
         
         public function start_read()
         {
@@ -181,10 +159,12 @@ class OrdenEsDController extends BaseController {
             {
                 $redsUpcs = array();
                 $redsUpcs = OrdenEsD::UPCFolioNotEnd();
-                if (count($redsUpcs) > 0) {                    
-                    $json_string = file_get_contents($this->pathPublic.'/responseupcs.json');
+                if (count($redsUpcs) > 0) { 
+                    $order = new OrdenEsM();
+                    $json_string = $order->contentFile();
+                    //echo "ok";die();
                     $folioUpcs = json_decode($json_string);            
-                    $messages = $this->comparedMessage($redsUpcs,$folioUpcs);
+                    $messages = $this->comparedMessage($redsUpcs,$folioUpcs->products);
                     $idUser = "";
                     $idUser = User::idUPCUser($redsUpcs);
                     EventsLog::saveLog($messages,$folio,$idUser);
@@ -198,7 +178,7 @@ class OrdenEsDController extends BaseController {
             else{
                 return View::make('PortalTemplate',['step' => "check"]);
             }            
-        }       
+        }               
         
         public function comparedMessage($redsUpcs,$folioUpcs)
         {
@@ -220,7 +200,7 @@ class OrdenEsDController extends BaseController {
                                     " de tags leeidas, se esperaban ".$upcfolio->quantity;
                             }elseif($upcRead->quantity > $upcfolio->quantity){
                                 $message =$message. " hay ". $upcRead->quantity.
-                                    " en tagas leeidas,solo se esperaban ".$upcfolio->quantity;                          
+                                    " en tags leeidas,solo se esperaban ".$upcfolio->quantity;                          
                             }
                             $messages[$index] = $message;
                             $index = $index + 1;

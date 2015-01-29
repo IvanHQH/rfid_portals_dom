@@ -14,7 +14,14 @@
 class OrdenEsM extends BaseModel{
     //put your code here
     
-    var $idCutomer;
+    var $idCutomer;   
+    var $pathPublic = "/home/developer/Projects/RFID/laravel/public";
+    
+    public function contentFile()
+    {
+        $json = file_get_contents($this->pathPublic.'/responseupcs.json');
+        return $json;
+    }      
     
     public function OrdenEsD()
     {        
@@ -44,6 +51,28 @@ class OrdenEsM extends BaseModel{
         return $id;
     }
     
+    public static function indexAllForViewLayout()
+    {
+        $ordersM = DB::table('orden_es_ms')->where('customer_id',
+                Auth::user()->customer_id)->orderBy('created_at', 'desc')->get();
+        $ordersMView = array();
+        $i = 0;
+        foreach ($ordersM as $order)
+        {
+            if(Customer::where('id',$order->customer_id)->count() == 1)
+            {
+                $order->customer_id = Customer::where('id',$order->customer_id)->get()[0]->name;
+                if($order->type == 1)
+                    $order->type = "Entarda";
+                else
+                    $order->type = "Salida";
+                $ordersMView[$i] = $order;
+                $i = $i + 1;
+            }
+        }
+        return $ordersMView;
+    }
+
     /*
      * update the number folio and put as no pending 
      */        
@@ -61,4 +90,14 @@ class OrdenEsM extends BaseModel{
         }
         else{}
     }    
+    
+    public static function idLastFolio($folio,$dateTime)
+    {
+        $orders = OrdenEsM::where('folio',$folio)->where('created_at',$dateTime)->get();
+        if(count($orders) > 0)
+        {
+            return $order[0]->id;
+        }
+        return 0;
+    }
 }
