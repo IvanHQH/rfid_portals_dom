@@ -16,7 +16,7 @@ class EventsLogController extends BaseController {
     
     public function index()
     {
-        return View::make('EventsLogTemplate');
+        
     }    
     
     /**
@@ -25,8 +25,8 @@ class EventsLogController extends BaseController {
      */
     public function store()
     {    
-        $id = OrdenEsM::idLastFolio(Input::get('folio'),Input::get('cretaed_at'));        
-        {                
+        $id = OrdenEsM::idLastFolio(Input::get('folio'),Input::get('created_at'));   
+        if($id != 0){
             $log = new EventsLog();
             $log->event_id = $id;
             $log->user_id = Input::get('user_id');
@@ -35,8 +35,8 @@ class EventsLogController extends BaseController {
             $log->created_at = Input::get('created_at');
             $log->updated_at = Input::get('updated_at');
             $log->customer_id = Input::get('customer_id');
-            $log->save();
-        }        
+            $log->save(); 
+        }
     }    
     
     public function rows_data()
@@ -56,4 +56,18 @@ class EventsLogController extends BaseController {
         return $logs;
     }       
     
+    public function comparison_rows($id)
+    {
+        $logs = EventsLog::where('event_id',$id)->get();
+        $log = $logs[0];
+        $comps = explode(',',$log->description);
+        $rescomps = array();
+        $i = 0;
+        foreach($comps as $comp)
+        {
+            $rescomps[$i] = $comp;
+            $i = $i + 1;
+        }
+        return View::make('EventsLogTemplate',['rescomps' => $rescomps]);
+    }    
 }

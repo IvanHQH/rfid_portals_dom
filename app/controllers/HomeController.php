@@ -60,13 +60,11 @@ class HomeController extends BaseController {
                         
         public function test()
         {    
-            /*$order = new OrdenEsM();
-            $folioUpcs = $order->contentFile();
-            $folioUpcs = json_decode($folioUpcs);
-            foreach ($folioUpcs->products as $upcfolio){
-                echo $upcfolio->name;die();
-            }*/
-            return ":)";
+            $orders = OrdenEsM::where('folio','7001')->where('created_at','2015-01-31 13:26:47')->get();
+            if(count($orders) > 0)
+            {
+                return $orders[0]->id;
+            }            
         }        
         
         public function test_get_folio()
@@ -129,5 +127,10 @@ class HomeController extends BaseController {
         {
             Auth::logout(); // log the user out of our application
             return Redirect::to('login'); // redirect the user to the login screen            
+        }
+        
+        public function test_conection()
+        {
+            return "ok";
         }
 }

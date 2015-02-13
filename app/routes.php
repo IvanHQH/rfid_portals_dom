@@ -43,6 +43,8 @@ Route::get('/test', 'HomeController@test');
 Route::resource('ordenesm', 'OrdenEsMController');
 Route::resource('logs', 'EventsLogController');
 Route::get('/reset_read','HomeController@reset_read');
+Route::resource('customer', 'CustomerController');
+Route::get('/test_conection','HomeController@test_conection');
 Route::group(array('before' => 'auth'), function()
 {    
     Route::post('/test_get_product', 'HomeController@test_get_product');    
@@ -70,8 +72,7 @@ Route::group(array('before' => 'auth'), function()
     Route::post('/sync/postRead', 'SyncController@postRead');
 
     Route::get('/events_logs/rows_data', 'EventsLogController@rows_data');
-
-    Route::resource('customer', 'CustomerController');
+    Route::get('comparison/{id?}', 'EventsLogController@comparison_rows');    
 
     Route::resource('product', 'ProductController');
 

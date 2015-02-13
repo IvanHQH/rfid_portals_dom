@@ -63,7 +63,7 @@ class OrdenEsM extends BaseModel{
             {
                 $order->customer_id = Customer::where('id',$order->customer_id)->get()[0]->name;
                 if($order->type == 1)
-                    $order->type = "Entarda";
+                    $order->type = "Entrada";
                 else
                     $order->type = "Salida";
                 $ordersMView[$i] = $order;
@@ -76,7 +76,7 @@ class OrdenEsM extends BaseModel{
     /*
      * update the number folio and put as no pending 
      */        
-    public static function updateOrderFolio($folio)
+    public static function updateOrderFolio($folio,$type)
     {
         $count = OrdenEsM::where('pending',1)->count();
         if($count > 0)
@@ -86,6 +86,10 @@ class OrdenEsM extends BaseModel{
             $orderM = $orderM[0];
             $orderM->folio = $folio;
             $orderM->pending = 0;
+            if($type == 'Entrada')
+                $orderM->type = 1;
+            else
+                $orderM->type = 0;
             $orderM->save();
         }
         else{}
@@ -96,7 +100,7 @@ class OrdenEsM extends BaseModel{
         $orders = OrdenEsM::where('folio',$folio)->where('created_at',$dateTime)->get();
         if(count($orders) > 0)
         {
-            return $order[0]->id;
+            return $orders[0]->id;
         }
         return 0;
     }

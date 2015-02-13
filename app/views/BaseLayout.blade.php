@@ -26,7 +26,6 @@
                 <ul class="nav navbar-nav navbar-right">                                        
                     <li id="menu_dashboard"><a href="/showread">Lectura Portal</a></li>
                     <li id="menu_ordenesm"><a href="/ordenesm">Lecturas</a></li>
-                    <li id="menu_logs"><a href="/logs">Comparesiones</a></li>  
                     <li id="menu_logout"><a href="/logout">Cerrar Sesión</a></li>
                 </ul>
             </div>            
@@ -39,7 +38,6 @@
                 <ul class="nav nav-sidebar">
                     <li id="menu_dashboard"><a href="/showread">Lectura Portal</a></li>
                     <li id="menu_ordenesm"><a href="/ordenesm">Lecturas</a></li>
-                    <li id="menu_logs"><a href="/logs">Comparesiones</a></li>
                 </ul>              
                 <h3 class="sub-header">Antenas</h3>
                 <ul class="nav nav-sidebar" style="padding-left: 20px">

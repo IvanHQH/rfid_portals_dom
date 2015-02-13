@@ -82,16 +82,7 @@ class OrdenEsDController extends BaseController {
             //return Response::json($ordenesd);
             return View::make('OrdenDTemplate',['ordenesd' => $ordenesd,'folio' => $ordenm->folio]);
 	}
-        /*
-	public function show($id)
-	{            
-            /*$tags = OrdenEsD::where('orden_es_m_id',$id)->get();
-            return Response::json($tags);*/
-            /*$tags = OrdenEsD::where('orden_es_m_id',$id)->get();
-            return View::make('OrdenDTemplate',['customers' => $tags]);
-            return View::make('OrdenDTemplate',['id' => $id]);
-	}        
-        */
+
 	/**
 	 * Show the form for editing the specified resource.
 	 *
@@ -155,6 +146,7 @@ class OrdenEsDController extends BaseController {
         {
             $messages = array();
             $folio = Input::get('folio');
+            $type = Input::get('type');
             if($folio != null)
             {
                 $redsUpcs = array();
@@ -168,7 +160,7 @@ class OrdenEsDController extends BaseController {
                     $idUser = "";
                     $idUser = User::idUPCUser($redsUpcs);
                     EventsLog::saveLog($messages,$folio,$idUser);
-                    OrdenEsM::updateOrderFolio($folio);                                               
+                    OrdenEsM::updateOrderFolio($folio,$type);                                               
                 }
                 else{
                     $messages[0] = "no hay lecturas de tags";
@@ -197,10 +189,10 @@ class OrdenEsDController extends BaseController {
                             $message = "[".$upcRead->upc."]"."[".$upcRead->name."]";
                             if($upcRead->quantity < $upcfolio->quantity){                                
                                 $message = $message." hay solo ". $upcRead->quantity.
-                                    " de tags leeidas, se esperaban ".$upcfolio->quantity;
+                                    " de tags leeidas se esperaban ".$upcfolio->quantity.",";
                             }elseif($upcRead->quantity > $upcfolio->quantity){
                                 $message =$message. " hay ". $upcRead->quantity.
-                                    " en tags leeidas,solo se esperaban ".$upcfolio->quantity;                          
+                                    " en tags leeidas solo se esperaban ".$upcfolio->quantity.",";                          
                             }
                             $messages[$index] = $message;
                             $index = $index + 1;
@@ -210,7 +202,7 @@ class OrdenEsDController extends BaseController {
                 }
                 if($find == false){
                     $message = "[".$upcfolio->upc."]"."[".$upcRead->name."]"
-                        . " no se encuentra en las tags leeidas";
+                        . " no se encuentra en las tags leeidas,";
                     $messages[$index] = $message;
                     $index = $index + 1;
                 }
@@ -227,7 +219,7 @@ class OrdenEsDController extends BaseController {
                 }
                 if($find == false){
                     $message = "[".$upcfolio->upc."]"."[".$upcRead->name."]".
-                        " no se esperaba en el folio";
+                        " no se esperaba en el folio,";
                     $messages[$index] = $message;
                     $index = $index + 1;                    
                 }

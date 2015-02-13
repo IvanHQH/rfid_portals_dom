@@ -61,13 +61,15 @@
     <div class="panel panel-info">
         <div class="panel-heading">
             <div class="panel-title">Sign Up</div>
-            <div style="float:right; font-size: 85%; position: relative; 
+            <!--div style="float:right; font-size: 85%; position: relative; 
                  top:-10px"><a id="signinlink" href="#" onclick="$('#signupbox').hide(); 
-                     $('#loginbox').show()">Sign In</a></div>
+                     $('#loginbox').show()">Sign In</a></div-->
         </div>  
         <div class="panel-body" >
-            <form id="signupform" class="form-horizontal" role="form" method="post" 
-                  action="/customer">
+            <!--form id="signupform" class="form-horizontal" role="form" method="post" 
+                  action="/customer"-->
+                {{Form::open(array('url' => 'customer',
+                            'method'=>'post','class'=>'form-horizontal'))}}            
                 <div id="signupalert" style="display:none" class="alert alert-danger">
                     <p>Error:</p>
                     <span></span></div>
@@ -88,7 +90,8 @@
                         <button id="btn-signup" type="btn btn-success" type="submit"
                             class="btn btn-info">Sign Up</button>                        
                     </div></div>
-            </form>
+                {{ Form::close() }}
+            <!--/form-->
         </div>
     </div>
 </div> 

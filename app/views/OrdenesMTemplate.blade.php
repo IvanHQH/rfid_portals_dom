@@ -10,9 +10,9 @@
                 data-pagination="true" data-search="true" data-show-columns = "true">                       
                 <thead>
                     <tr>
-                        <th  data-align="center">UPC's</th>                        
+                        <th  data-align="center">UPC's</th>
+                        <th  data-align="center">Comp.</th> 
                         <th  data-align="center" data-sortable="true">Fecha/Hora</th>
-                        <!--th  data-align="left" data-sortable="true">Cliente</th-->
                         <th  data-align="left" data-sortable="true">Folio</th>
                         <th  data-align="center" data-sortable="true">Tipo</th>
                     </tr>
@@ -25,6 +25,12 @@
 				{{ Form::submit('ver', array('class' => 'btn btn-default')) }}
 			{{ Form::close() }}                            
                         </td>
+                        <td>
+	 		{{ Form::open(array('url' => 'comparison/' . $order->id, 'class' => 'pull-center')) }}
+				{{ Form::hidden('_method', 'GET') }}
+				{{ Form::submit('ver', array('class' => 'btn btn-default')) }}
+			{{ Form::close() }}                         
+                        </td>                        
                         <td>{{$order->created_at}}</td>
                         <!--td>{{$order->customer_id}}</td-->
                         <td>{{$order->folio}}</td>

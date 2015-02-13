@@ -4,7 +4,7 @@
     @if (!isset($messages)) 
     <table style="width: 100%">
         <tr style="width: 100%">
-            <td style="width: 33%">    
+            <td style="width: 50%">    
             @if (isset($step))
                 @if ($step == 'start')
                 <form class="navbar-form navbar-left" role="form" method="post"
@@ -19,24 +19,23 @@
                   @if ($step == 'check')
                   <div class="form-group">
                     <input name="folio" type="text" class="form-control" placeholder="Folio">
-                  </div>
+                  </div>                    
+                    <select id="miselect" name="type" style="float:left" class="form-control">
+                            <option>Entrada</option>
+                            <option>Salida</option>
+                    </select>                                              
                   @endif
                     @if ($step == 'start')
-                        <button type="submit" class="btn btn-default">Iniciar lectura</button>
+                        <button type="submit" class="btn btn-default">Iniciar</button>
                     @elseif ($step == 'show_read')
-                        <button type="submit" class="btn btn-default">Ver lectura</button>      
+                        <button type="submit" class="btn btn-default">Ver</button>      
                     @elseif ($step == 'check')
-                        <button type="submit" class="btn btn-default">checar lectura</button>
+                        <button type="submit" class="btn btn-default">Comparar</button>
                     @endif                           
                 </form>
             @endif
             </td>
-            <td style="width: 40%" align="center">
-                @if (isset($customer))
-                    {{$customer->name}}
-                @endif                
-            </td>
-            <td style="width: 27%" align="right">
+            <td style="width: 50%" align="right">
                 <form role="form" method="get" action="/reset_read"> 
                     <button type="submit" class="btn btn-default">
                         Reset
