@@ -13,12 +13,14 @@ class HomeController extends BaseController {
 	|
 	|	Route::get('/', 'HomeController@showWelcome');
 	|
-	*/
-        
+	*/    
+    
         public function doLogin()
         {
-            $customers = Customer::all();
-            return View::make('CustomerTemplate',['customers' => $customers]);
+            $clients = Pclient::all();
+            $useModes = UseMode::all();            
+            return View::make('CustomerTemplate',['clients' => $clients,
+                'useModes' => $useModes]);
         }
         
         public function loginPost()
@@ -32,25 +34,41 @@ class HomeController extends BaseController {
 	}                          
         
         public function get_var_read()
-        {
-            $idCustomer = Input::get('idCustomer');
-            if(Variable::where('customer_id',$idCustomer)
+        {            
+            if(Variable::where('pclient_id',Input::get('client_id'))
                     ->where('name','read')->count() > 0)
             {
-                $read = Variable::where('customer_id',$idCustomer)
+                //return "1";
+                $read = Variable::where('pclient_id',Input::get('client_id'))
                         ->where('name','read')->get();
                 $read = $read[0]->value;
             }
+            //else
+            //    return "2";
             return $read;          
-        }
-        
-        public function set_no_read()
+        }        
+
+        public static function set_no_read_web()
         {
-            $idCustomer = Input::get('idCustomer');
-            if(Variable::where('customer_id',$idCustomer)
+            $idClient = $idClient = Auth::user()->pclient->id;
+            if(Variable::where('pclient_id',$idClient)
                     ->where('name','read')->count() > 0)
             {
-                $read = Variable::where('customer_id',$idCustomer)
+                $read = Variable::where('pclient_id',$idClient)
+                        ->where('name','read')->get();
+                $read = $read[0];
+                $read->value = "0";
+                $read->save();
+            }            
+        }           
+        
+        public function set_no_read()
+        {    
+            $idClient = Input::get('client_id');
+            if(Variable::where('pclient_id',$idClient)
+                    ->where('name','read')->count() > 0)
+            {
+                $read = Variable::where('pclient_id',$idClient)
                         ->where('name','read')->get();
                 $read = $read[0];
                 $read->value = "0";
@@ -60,26 +78,44 @@ class HomeController extends BaseController {
                         
         public function test()
         {    
-            $orders = OrdenEsM::where('folio','7001')->where('created_at','2015-01-31 13:26:47')->get();
-            if(count($orders) > 0)
+            $idOrderM = OrdenEsM::idPendingClient(6);
+            $folio = OrdenEsD::UPCsFolio($idOrderM);
+
+            $order = new OrdenEsM();
+            $json_string = $order->contentFile();
+            $folioUpcs = json_decode($json_string);   
+            $folioUpcs = $folioUpcs->products;        
+
+            foreach ($folio as $orderD)
             {
-                return $orders[0]->id;
-            }            
+                $prod = self::ProductFolio($orderD->upc,$folioUpcs);
+                if($prod != NULL){
+                    $orderD->quantityf = $prod->quantity;
+                    if ($orderD->quantity == $prod->quantity){              
+                        $orderD->ok = true;
+                    }
+                    else {                                   
+                        $orderD->ok = false;
+                    }          
+                }
+            }
+            return $folio;
         }        
+        
+    public static function ProductFolio($upc,$folioUpcs)
+    {        
+        foreach ($folioUpcs as $upcfolio){
+            if($upc == $upcfolio->upc){       
+                return $upcfolio;
+            }
+        }
+        return NULL;        
+    }        
         
         public function test_get_folio()
         {
-            /*
-            $prods = array();
-            $prods[0] = new RespProduct("Textil Brillante", 2);
-            $prods[1] = new RespProduct("Madera Brillante Monterreal", 2);
-            $res['products'] = $prods;
-             * */
-            //OrdenEsDController order = new OrdenEsDController();
-            //return ":)";
             $order = new OrdenEsM();
             $res = $order->contentFile();
-            //$res = json_decode($res);
             return $res;
         }
         
@@ -107,20 +143,20 @@ class HomeController extends BaseController {
             return "yes save";
         }         
         
-        public function reset_read()
+        public static function reset_read()
         {
-            $var = Variable::where('name','read')->where('customer_id',1)->get();
+            $idClient = Auth::user()->pclient->id;
+            $var = Variable::where('name','read')->where('pclient_id',$idClient)->get();
             $var[0]->value = '0';
             $var[0]->save();
             
-            $ordenesm = OrdenEsM::where('pending',1)->where('customer_id',1)->get();
+            $ordenesm = OrdenEsM::where('pending',1)->where('pclient_id',$idClient)->get();
             
             foreach ($ordenesm as $ordenm){
                 $ordenm->pending = 0;
                 $ordenm->save();
             }
             return Redirect::to('/showread'); 
-            //"/showread"
         }
         
         public function logout()

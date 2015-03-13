@@ -18,13 +18,19 @@
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>                    
                 </button>
                 <img src="/img/grupo_hqh_logo.png"></td>
             </div>
+            <div class="navbar-header" style="margin-left: 10px;margin-top: 10px;color: white">
+                {{Auth::user()->pclient->name}} | {{Auth::user()->pclient->useMode->name}}
+            </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav navbar-right">                                        
-                    <li id="menu_dashboard"><a href="/showread">Lectura Portal</a></li>
+                <ul class="nav navbar-nav navbar-right">  
+                    @if (Auth::user()->pclient->useMode->id == 1 ||
+                        Auth::user()->pclient->useMode->id == 4)
+                        <li id="menu_dashboard"><a href="/showread">Lectura Portal</a></li>
+                    @endif
                     <li id="menu_ordenesm"><a href="/ordenesm">Lecturas</a></li>
                     <li id="menu_logout"><a href="/logout">Cerrar Sesión</a></li>
                 </ul>
@@ -36,20 +42,26 @@
             <div class="col-sm-3 col-md-2 sidebar">
                 <h3 class="sub-header">Principal</h3>
                 <ul class="nav nav-sidebar">
-                    <li id="menu_dashboard"><a href="/showread">Lectura Portal</a></li>
+                    @if (Auth::user()->pclient->useMode->id == 1 ||
+                        Auth::user()->pclient->useMode->id == 4)
+                        <li id="menu_dashboard"><a href="/showread">Lectura Portal</a></li>
+                    @endif
                     <li id="menu_ordenesm"><a href="/ordenesm">Lecturas</a></li>
-                </ul>              
-                <h3 class="sub-header">Antenas</h3>
-                <ul class="nav nav-sidebar" style="padding-left: 20px">
-                    <li id="antena_1">
-                        <button type="button" class="btn btn-default">
-                        <img src="/img/antena_rfid_mini.png"/>1</button>
-                    </li><br />
-                    <li id="antena_2">
-                        <button type="button" class="btn btn-default">
-                        <img src="/img/antena_rfid_mini.png"/>2</button>
-                    </li>                                        
-                </ul>
+                </ul> 
+                @if (Auth::user()->pclient->useMode->id == 1||
+                        Auth::user()->pclient->useMode->id == 4)
+                    <h3 class="sub-header">Antenas</h3>
+                    <ul class="nav nav-sidebar" style="padding-left: 20px">
+                        <li id="antena_1">
+                            <button type="button" class="btn btn-default">
+                            <img src="/img/antena_rfid_mini.png"/>1</button>
+                        </li><br />
+                        <li id="antena_2">
+                            <button type="button" class="btn btn-default">
+                            <img src="/img/antena_rfid_mini.png"/>2</button>
+                        </li>                                        
+                    </ul>
+                @endif
                 <h3 class="sub-header">Usuario</h3>
                 <ul class="nav nav-sidebar">
                     <li id="menu_logout"><a href="/logout">Cerrar Sesión</a></li>

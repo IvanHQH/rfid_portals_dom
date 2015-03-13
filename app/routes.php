@@ -26,13 +26,30 @@ Route::post('login', function(){
         if($user[0]->password == Input::get('password'))
         {
             Auth::loginUsingId($user[0]->id);
-            User::setCustomerSelect($user[0]->id, Input::get('nameCustomer'));
-            return Redirect::to('showread');
+            User::setCustomerSelect($user[0]->id, Input::get('nameClient'));
+            return Redirect::to('ordenesm');
         }
         else
             return Redirect::to('login');        
     }
 });
+
+Route::post('login_forced', function(){
+    $user = User::find(Input::get('id'));
+    if($user != null){
+       if($user->password == Input::get('pwd'))
+       {
+           Auth::loginUsingId($user->id);
+           $user->pclient_id = Input::get('client_id');           
+           $user->save();
+           return "ok";
+       }
+       else
+           return 'pwd fail';        
+    }
+    else return "user not found";  
+});
+
 Route::get('/login', 'HomeController@doLogin');
 Route::post('/test_get_folio', 'HomeController@test_get_folio');
 Route::post('/ordenesmhd', 'OrdenEsMController@storeHandheld');
@@ -45,17 +62,26 @@ Route::resource('logs', 'EventsLogController');
 Route::get('/reset_read','HomeController@reset_read');
 Route::resource('customer', 'CustomerController');
 Route::get('/test_conection','HomeController@test_conection');
+Route::resource('pclient', 'PclientController');
+Route::resource('usemode', 'UseModeController');
+Route::get('/logout','HomeController@logout');
+Route::post('/order_pending', 'OrdenEsMController@order_pending');
+Route::post('/update_ordenesd', 'OrdenEsDController@update_ordenesd');
+
 Route::group(array('before' => 'auth'), function()
 {    
     Route::post('/test_get_product', 'HomeController@test_get_product');    
-    Route::get('/logout','HomeController@logout');
     Route::post('/add_product', 'HomeController@add_product');
+    Route::get('/variables/set_no_read_portal',
+            'HomeController@set_no_read_web');
 
-    Route::get('/upc/data_pending', 'OrdenEsDController@row_data_pending');
+    Route::get('/upc/data_pending', 'OrdenEsDController@row_data_pending');    
+    
     Route::get('/upc/data/{id?}', 'OrdenEsDController@row_data');    
     Route::post('/read/start_read', 'OrdenEsDController@start_read');
     Route::post('/read/show_read', 'OrdenEsDController@show_read');
     Route::post('/read/checkfolio', 'OrdenEsDController@checkfolio');
+    Route::post('/read/refresh_read', 'OrdenEsDController@refresh_read');
 
     Route::get('/ordenesm',  'OrdenEsMController@getIndex');
     Route::get('/getIndexData',  'OrdenEsMController@getIndexData');
@@ -73,7 +99,8 @@ Route::group(array('before' => 'auth'), function()
 
     Route::get('/events_logs/rows_data', 'EventsLogController@rows_data');
     Route::get('comparison/{id?}', 'EventsLogController@comparison_rows');    
-
+    //showUseMode
+    Route::get('showUseMode/{id?}', 'OrdenEsDController@showUseMode');
     Route::resource('product', 'ProductController');
 
 });

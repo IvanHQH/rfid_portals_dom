@@ -27,13 +27,16 @@
                     </div>
                     <div style="margin-bottom: 25px" class="input-group">
                         <span class="input-group-addon"><i class="glyphicon-barcode"></i></span>
-                        <select id="miselect" name="nameCustomer" 
+                        <select id="miselect" name="nameClient" 
                                 class="form-control" style="float:right">
-                            @foreach($customers as $customer)
-                                <option>{{$customer->name}}</option>
+                            @foreach($clients as $client)
+                                <option>{{$client->name}}</option>
                             @endforeach                               
                         </select>                            
-                    </div>                        
+                    </div>                                             
+                    <!--div style="margin-bottom: 25px" class="input-group">
+                        <p id="use_mode" style="float:left">Hola Mundo</p>
+                    </div-->                                                         
                     <div style="margin-top:10px" class="form-group">
                         <div class="col-md-12 control">
                             <button id="btn-login" type="btn btn-success" type="submit"
@@ -61,14 +64,9 @@
     <div class="panel panel-info">
         <div class="panel-heading">
             <div class="panel-title">Sign Up</div>
-            <!--div style="float:right; font-size: 85%; position: relative; 
-                 top:-10px"><a id="signinlink" href="#" onclick="$('#signupbox').hide(); 
-                     $('#loginbox').show()">Sign In</a></div-->
         </div>  
         <div class="panel-body" >
-            <!--form id="signupform" class="form-horizontal" role="form" method="post" 
-                  action="/customer"-->
-                {{Form::open(array('url' => 'customer',
+                {{Form::open(array('url' => 'pclient',
                             'method'=>'post','class'=>'form-horizontal'))}}            
                 <div id="signupalert" style="display:none" class="alert alert-danger">
                     <p>Error:</p>
@@ -76,22 +74,31 @@
                 <div class="form-group">
                     <label for="firstname" class="col-md-3 control-label">Empresa</label>
                     <div class="col-md-9">
-                        <input type="text" class="form-control" name="customerName" 
+                        <input type="text" class="form-control" name="clientName" 
                                placeholder="Empresa">
                     </div></div>
+                <div  class="form-group">
+                    <label for="lblUseMode" class="col-md-3 control-label">Modo de Uso</label>
+                    <div class="col-md-9">
+                        <select id="miselect" name="useMode" 
+                                class="form-control" style="float:right">
+                            @foreach($useModes as $useMode)
+                                <option>{{$useMode->name}}</option>
+                            @endforeach                               
+                        </select>   
+                    </div>
+                </div>                              
                 <div class="form-group">
                     <label for="icode" class="col-md-3 control-label">Logotipo</label>
                     <div class="col-md-9">
                         <input class="form-control" type="file" name="Logo" id="archivo">
                     </div></div>               
-                <div class="form-group">
-                    <!-- Button -->                                        
+                <div class="form-group">                                
                     <div class="col-md-offset-3 col-md-9">
                         <button id="btn-signup" type="btn btn-success" type="submit"
                             class="btn btn-info">Sign Up</button>                        
                     </div></div>
                 {{ Form::close() }}
-            <!--/form-->
         </div>
     </div>
 </div> 
@@ -99,16 +106,8 @@
 @stop
 @section('scripts')
 <script>
-    $(".dropdown-menu li a").click(function(){
-        //echo algo;
-        //$("#select_company").text($(this).text());
-        $("#select_company").val("plomeria selecta");
-        //$("#select_company").val($(this.id()));
-        //echo "hola";die();
-        //window.location="algo";
-    });  
-    $("#miselect").change(function() {
-     //alert("Han cambiado mi valor"); 
-    });  
+    /*$("#miselect").change(function() {     
+        $("#use_mode").text("change");
+    });*/
 </script>  
 @stop

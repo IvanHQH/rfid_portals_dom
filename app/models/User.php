@@ -23,11 +23,11 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
      */
     protected $hidden = array('password', 'remember_token');
     protected $fillable = array('name', 'password');
-    public static function idUPCUser($redsUpcs)
+    public static function idUPCUser($redsUpcs,$idClient)
     {
         $result = "";
         $users = User::all();
-        $readsUpcs = OrdenEsD::UPCFolioNotEnd();
+        $readsUpcs = OrdenEsD::UPCsPending($idClient);
         //return Response::json($users);
         foreach ($users as $user){
             foreach ($readsUpcs as $upcRead){
@@ -43,11 +43,11 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         return $result;
     }        
 
-    public static function setCustomerSelect($idUser,$nameCustomer)
+    public static function setCustomerSelect($idUser,$nameClient)
     {
         $user = User::find($idUser);
-        $customer = Customer::Where('name',$nameCustomer)->get(); 
-        $user->customer_id = $customer[0]->id;
+        $client= Pclient::Where('name',$nameClient)->get(); 
+        $user->pclient_id = $client[0]->id;
         $user->save();
     }
 
@@ -62,4 +62,8 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         return $this->password;
     }        
         
+    public function pclient()
+    {        
+        return $this->belongsTo('Pclient');
+    }    
 }

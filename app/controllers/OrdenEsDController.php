@@ -17,24 +17,24 @@ class OrdenEsDController extends BaseController {
 	 * Display a listing of the resource.
 	 *
 	 * @return Response
-	 */        
-                
+	 */                        
         public function index()
 	{
             $ordern_es_ds = array();
             $ordern_es_ds['orden_es_ds'] = OrdenEsD::all();
             return Response::json($ordern_es_ds);
-	}   
+	}           
         
         public function row_data_pending()
         {
-            $ordenM = OrdenEsD::UPCFolioNotEnd(); 
+            $idClient = Auth::user()->pclient->id;
+            $ordenM = OrdenEsD::UPCsPending($idClient); 
             return Response::json($ordenM);
-        }
+        }        
 
         public function row_data($idOrdenM)
         {
-            $ordenM = OrdenEsD::UPCFolio($idOrdenM); 
+            $ordenM = OrdenEsD::UPCsFolio($idOrdenM); 
             return Response::json($ordenM);
         }        
         
@@ -57,8 +57,8 @@ class OrdenEsDController extends BaseController {
 	 */
 	public function store()
 	{              
-            $nextId = OrdenEsM::nextId();
             $input = Input::all();
+            $nextId = OrdenEsM::nextId($input['client_id']);
             $ordenD = new OrdenEsD();
             $ordenD->upc = $input['upc'];
             $ordenD->epc = $input['epc'];
@@ -77,12 +77,29 @@ class OrdenEsDController extends BaseController {
 	 */
 	public function show($id)
 	{                        
-            $ordenm = OrdenEsM::find($id);                    
-            $ordenesd = OrdenEsD::UPCFolio($id); 
-            //return Response::json($ordenesd);
-            return View::make('OrdenDTemplate',['ordenesd' => $ordenesd,'folio' => $ordenm->folio]);
+
 	}
 
+	public function showUseMode($id)
+	{                        
+            $idUseMode = Auth::user()->pclient->useMode->id;
+            $ordenm = OrdenEsM::find($id);
+            switch($idUseMode){
+                case 1://folio comparison      
+                case 4://folio comparison 
+                    $ordenesd = OrdenEsD::UPCsFolio($id); 
+                    return View::make('OrdenDTemplate',['ordenesd' => $ordenesd,
+                        'description' => $ordenm->folio]);                    
+                    break;
+                case 2://inventory place
+                case 3://inventory                     
+                    $ordenesd = OrdenEsD::UPCsInventoryPlace($id);
+                    return View::make('OrdenDTemplate',['ordenesd' => $ordenesd,
+                        'description' => $ordenm->warehouse->name]);                   
+                    break;   
+            }
+	}        
+        
 	/**
 	 * Show the form for editing the specified resource.
 	 *
@@ -93,7 +110,6 @@ class OrdenEsDController extends BaseController {
 	{		
 
 	}
-
         
 	/**
 	 * Update the specified resource in storage.
@@ -116,30 +132,43 @@ class OrdenEsDController extends BaseController {
 	{
 
 	}
-        
-        
+                
         public function start_read()
         {
-            $idCustomer = 1;
-            if(Variable::where('customer_id',$idCustomer)
+            $idCustomer = Auth::user()->pclient->id;
+            if(Variable::where('pclient_id',$idCustomer)
                     ->where('name','read')->count() > 0)
             {
-                $read = Variable::where('customer_id',$idCustomer)
+                $read = Variable::where('pclient_id',$idCustomer)
                         ->where('name','read')->get();
                 $read = $read[0];
                 $read->value = "1";
                 $read->save();
-            }
-            return View::make('PortalTemplate',['step' => 'show_read']);
+            }            
+            $idUseMode = Auth::user()->pclient->useMode->id;
+            switch($idUseMode){           
+                case 1://folio comparison                  
+                    return View::make('PortalTemplate',['step' => 'show_read']);
+                    break;          
+                case 4://folio comparison axa     
+                    return View::make('PortalTemplate',['step' => 'refresh_read']);
+                    break;
+            }   
+        }
+               
+        public function refresh_read()
+        {            
+            return View::make('PortalTemplate',['step' => 'refresh_read']);
         }
         
         public function show_read()
         {
-            $idPending = OrdenEsM::idPending();
+            $idClient = Auth::user()->pclient->id;
+            $idPending = OrdenEsM::idPendingClient($idClient);
             if($idPending > 0)
                 return View::make('PortalTemplate',['step' => 'check']);
             else
-                return View::make('PortalTemplate',['step' => 'show_read']);
+                return View::make('PortalTemplate',['step' => 'show_read']);                         
         }           
         
         public function checkfolio()
@@ -150,27 +179,40 @@ class OrdenEsDController extends BaseController {
             if($folio != null)
             {
                 $redsUpcs = array();
-                $redsUpcs = OrdenEsD::UPCFolioNotEnd();
+                $redsUpcs = OrdenEsD::UPCsPending(Auth::user()->pclient->id);
                 if (count($redsUpcs) > 0) { 
                     $order = new OrdenEsM();
                     $json_string = $order->contentFile();
-                    //echo "ok";die();
                     $folioUpcs = json_decode($json_string);            
                     $messages = $this->comparedMessage($redsUpcs,$folioUpcs->products);
                     $idUser = "";
-                    $idUser = User::idUPCUser($redsUpcs);
-                    EventsLog::saveLog($messages,$folio,$idUser);
+                    $idUser = User::idUPCUser($redsUpcs,Auth::user()->pclient->id);
+                    EventsLog::saveLog($messages,$folio,$idUser,Auth::user()->pclient->id);
                     OrdenEsM::updateOrderFolio($folio,$type);                                               
                 }
                 else{
                     $messages[0] = "no hay lecturas de tags";
-                }
+                }                
                 return View::make('PortalTemplate',['messages' => $messages]);  
             }
             else{
+                HomeController::set_no_read_web();
                 return View::make('PortalTemplate',['step' => "check"]);
             }            
         }               
+        
+        public function update_ordenesd()
+        {            
+            //return Input::get('idClient');
+            $idPending = OrdenEsM::idPendingClient(Input::get('client_id'));
+            if($idPending > 0)  
+            {
+                DB::table('orden_es_ds')->where('orden_es_m_id',
+                        $idPending )->delete();
+                return 1;
+            }
+            return 2;
+        }   
         
         public function comparedMessage($redsUpcs,$folioUpcs)
         {

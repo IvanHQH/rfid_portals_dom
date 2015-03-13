@@ -13,28 +13,58 @@
  */
 class OrdenEsD extends BaseModel{
     //put your code here
-    /*public function OrdenEsM()
-    {
-        return $this->hasMany('SubtypeService');
-    }*/
     
+    public static function UPCsPending($idClient){
+        $idOrderM = OrdenEsM::idPendingClient($idClient);
+        $folio = OrdenEsD::UPCsFolio($idOrderM);
 
-    public static function UPCFolioNotEnd(){
-        $idOrderM = OrdenEsM::idPending();
-        $folio = OrdenEsD::UPCFolio($idOrderM);
+        $order = new OrdenEsM();
+        $json_string = $order->contentFile();
+        $folioUpcs = json_decode($json_string);   
+        $folioUpcs = $folioUpcs->products;        
+
+        foreach ($folio as $orderD)
+        {
+            $prod = self::ProductFolio($orderD->upc,$folioUpcs);
+            if($prod != NULL){
+                $orderD->quantityf = $prod->quantity;
+                if ($orderD->quantity == $prod->quantity)          
+                    $orderD->ok = true;
+                else                                 
+                    $orderD->ok = false;    
+            }
+        }
+        $found = false;
+        if(Auth::user()->pclient->useMode->id == 4){            
+            foreach ($folioUpcs as $upcfolio){
+                $found = false;
+                foreach ($folio as $upcRead){
+                    if ($upcfolio->upc == $upcRead->upc){
+                        $found = true;
+                        break;
+                    }
+                }
+                if($found == false){
+                    $prod = new UPCRowView($upcfolio->upc,$upcfolio->name,$upcfolio->quantity);             
+                    $prod->ok = false;
+                    $prod->quantityf = 0;
+                    array_push($folio,$prod);
+                }
+            }
+        }
+        sort($folio);
         return $folio;
     }    
     
-    public static function UPCFolio($idOrderM)
+    public static function UPCsFolio($idOrderM)
     {
         $ordersD = OrdenEsD::where('orden_es_m_id',$idOrderM)->get();
-        $i = 0;
+        //$i = 0;
         $folio = array();
         foreach ($ordersD as $orderD)
         {
             $count = Product::where('upc',$orderD->upc)->count();
             if($count > 0){
-
                 $pos = -1;
                 $j = 0;
                 foreach ($folio as $upc){
@@ -47,27 +77,34 @@ class OrdenEsD extends BaseModel{
                 }                   
                 if($pos == -1){
                     $name = Product::nameProduct($orderD->upc);
-                    $pf = new UPCFolio($orderD->upc,$name,1);
-                    $folio[$i] = $pf;
-                    $i = $i + 1;
-                }else{
-                   $folio[$pos]->quantity = $folio[$pos]->quantity+1;
-                }                    
+                    $pf = new UPCRowView($orderD->upc,$name,1);
+                    array_push($folio,$pf);
+                    //$folio[$i] = $pf;
+                    //$i = $i + 1;
+                }else
+                   $folio[$pos]->quantity = $folio[$pos]->quantity+1;              
             }
         }
         return $folio;        
     }
     
+    public static function ProductFolio($upc,$folioUpcs)
+    {
+        foreach ($folioUpcs as $upcfolio){
+            if($upc == $upcfolio->upc){                
+                return $upcfolio;
+            }
+        }
+        return NULL;        
+    }
+
     public static function jsonTagsToUpcs($ordersD){
-        //$json_string = file_get_contents($this->pathPublic.'/readstags.json');
         $folio = array();
-        //$ordersD = json_decode($json_string); 
-        $i = 0;
+        //$i = 0;
         foreach ($ordersD as $orderD)
         {
             $count = Product::where('upc',$orderD->upc)->count();
             if($count > 0){
-
                 $pos = -1;
                 $j = 0;
                 foreach ($folio as $upc){
@@ -80,14 +117,30 @@ class OrdenEsD extends BaseModel{
                 }                   
                 if($pos == -1){
                     $name = Product::nameProduct($orderD->upc);
-                    $pf = new UPCFolio($orderD->upc,$name,1);
-                    $folio[$i] = $pf;
-                    $i = $i + 1;
-                }else{
-                   $folio[$pos]->quantity = $folio[$pos]->quantity;
-                }                    
+                    $pf = new UPCRowView($orderD->upc,$name,1);
+                    array_push($folio,$pf);
+                    //$folio[$i] = $pf;
+                    //$i = $i + 1;
+                }else
+                   $folio[$pos]->quantity = $folio[$pos]->quantity;                  
             }
-        }
+        }        
         return $folio;        
     }    
+    
+    public static function UPCsInventoryPlace($idOrderM)
+    {
+        $ordersD = OrdenEsD::where('orden_es_m_id',$idOrderM)->get();
+        //$i = 0;
+        $folio = array();
+        foreach ($ordersD as $orderD)
+        {
+            $name = Product::nameProduct($orderD->upc);
+            $pf = new UPCRowView($orderD->upc,$name,1);
+            array_push($folio,$pf);
+            //$folio[$i] = $pf;
+            //$i = $i + 1;
+        }
+        return $folio;     
+    }
 }

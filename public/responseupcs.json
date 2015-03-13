@@ -2,23 +2,38 @@
 [
   {
     "upc": "660010110023",
-    "quantity": 2,
-    "name": "Textil Brillante"
+    "quantity": 3,
+    "name": "Prod 001"
   },
   {
     "upc": "660010110092",
     "quantity": 2,
-    "name": "Madera Brillante Monterreal"
+    "name": "Asset 002"
   },
   {
     "upc": "660010109058",
     "quantity": 2,
-    "name": "Marmol Mate H"
+    "name": "Article 003"
   },
   {
     "upc": "660010110016",
+    "quantity": 3,
+    "name": "Prod 004"
+  },
+  {
+    "upc": "660010109119",
     "quantity": 2,
-    "name": "Marmol Brillante Reflex"
+    "name": "Article 006"
+  },  
+  {
+    "upc": "660010113109",
+    "quantity": 1,
+    "name": "Prod 007"
+  },  
+  {
+    "upc": "660010113031",
+    "quantity": 1,
+    "name": "Asset 008"
   }
 ]
 }

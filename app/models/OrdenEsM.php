@@ -28,47 +28,69 @@ class OrdenEsM extends BaseModel{
         return $this->hasMany('OrdenEsD');
     }
     
-    public static function nextId()
+    public static function nextId($idClient)
     {
         $id = 1;
-        $count = DB::table('orden_es_ms')->orderBy('id','desc')->take(1)->count();            
+        $count = DB::table('orden_es_ms')->where('pclient_id',
+                $idClient)->orderBy('id','desc')->take(1)->count();            
         if($count > 0){
-            $lastOrderM = DB::table('orden_es_ms')->orderBy('id', 'desc')
+            $lastOrderM = DB::table('orden_es_ms')->where('pclient_id',
+                $idClient)->orderBy('id', 'desc')
                 ->take(1)->get();
-            $id = $lastOrderM[0]->id;                
+            $id = $lastOrderM[0]->id;           
         }
-        return $id;
+        return $id;        
     }
     
-    public static function idPending()
+    public static function idPendingClient($idClient)
     {
-        $count = OrdenEsM::where('pending',1)->count();
-        $id = -1;
+        //return $idClient;
+        $count = OrdenEsM::where('pending',1)->where('pclient_id',
+                $idClient)->count();        
+        $id = 0;
         if($count > 0){
-            $orderM = OrdenEsM::where('pending',1)->get();
+            $orderM = OrdenEsM::where('pending',1)->where('pclient_id',
+                $idClient)->get();
             $id = $orderM[0]->id;
-        }            
+        }
         return $id;
-    }
+    }            
     
     public static function indexAllForViewLayout()
     {
-        $ordersM = DB::table('orden_es_ms')->where('customer_id',
-                Auth::user()->customer_id)->orderBy('created_at', 'desc')->get();
+        $id = Auth::user()->pclient->useMode->id;
+        $ordersM = array();
+        switch($id)
+        {
+            case 1://folio comparison
+            case 4://folio comparison axa
+                $ordersM = self::foliocomparisonrows();
+                break;
+            case 2://inventory place
+            case 3://inventory
+                $ordersM = OrdenEsM::where('pclient_id',
+                        Auth::user()->pclient->id)->orderBy('created_at',
+                                'desc')->get();
+                break;
+        }
+        return $ordersM;
+    }    
+    
+    public static function foliocomparisonrows()
+    {        
+        $ordersM = OrdenEsM::where('pclient_id',
+                Auth::user()->pclient_id)->orderBy('created_at', 'desc')->get();
+        //$ordersM = OrdenEsM::all();
         $ordersMView = array();
-        $i = 0;
+        $i = 0;        
         foreach ($ordersM as $order)
         {
-            if(Customer::where('id',$order->customer_id)->count() == 1)
-            {
-                $order->customer_id = Customer::where('id',$order->customer_id)->get()[0]->name;
-                if($order->type == 1)
-                    $order->type = "Entrada";
-                else
-                    $order->type = "Salida";
-                $ordersMView[$i] = $order;
-                $i = $i + 1;
-            }
+            if($order->type == 1)
+                $order->type = "Entrada";
+            else
+                $order->type = "Salida";
+            $ordersMView[$i] = $order;
+            $i = $i + 1;
         }
         return $ordersMView;
     }
@@ -104,4 +126,26 @@ class OrdenEsM extends BaseModel{
         }
         return 0;
     }
+    
+    public static function idLastClient($idClient,$dateTime)
+    {
+        $orders = OrdenEsM::where('pclient_id',$idClient)->where('created_at',
+                $dateTime)->get();
+        if(count($orders) > 0)
+        {
+            return $orders[0]->id;
+        }
+        return 0;
+    }    
+    
+    public function customer()
+    {
+        return $this->belongsTo('Customer');
+    }
+    
+    public function warehouse()
+    {
+        return $this->belongsTo('Warehouse');    
+    }
+    
 }

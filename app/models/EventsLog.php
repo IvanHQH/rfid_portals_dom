@@ -20,7 +20,7 @@ class EventsLog extends BaseModel {
     /*
      * Save log for Portal
      */
-    public static function saveLog($messages,$folio,$idUser)
+    public static function saveLog($messages,$folio,$idUser,$idClient)
     {
         $allmessage = "";
         foreach ($messages as $message) {
@@ -29,7 +29,7 @@ class EventsLog extends BaseModel {
             else $allmessage = $message;
         }
         $allmessage = "folio = ".$folio." , ".$allmessage;
-        $id = OrdenEsM::idPending();
+        $id = OrdenEsM::idPendingClient($idClient);
         if($id > 0){
             $dt = new DateTime();
             $datetime = $dt->format('Y-m-d H:i:s');
@@ -43,7 +43,7 @@ class EventsLog extends BaseModel {
             $log->description = $allmessage;
             $log->created_at = $datetime;
             $log->updated_at = $datetime;
-            $log->customer_id = Auth::user()->customer_id;
+            $log->pclient_id = Auth::user()->pclient_id;
             $log->save();
         }
     }    

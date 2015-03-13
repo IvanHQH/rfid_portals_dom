@@ -4,8 +4,8 @@
     <div class="content-container">        
         <div class="table-responsive container" style="width: 100%; padding: 10px;">  
             <div class="alert alert-success" id="events-result" data-es="Aquí se muestra el resultado del evento">
-                @if (isset($folio))
-                    Folio {{$folio}}
+                @if (isset($description))
+                    {{$description}}
                 @endif
             </div>
             <table id="events-table" data-toggle="table" 
@@ -14,7 +14,11 @@
                     <tr>
                         <th data-field="name" data-align="left" data-sortable="true">Nombre</th>
                         <th data-field="upc" data-align="left" data-sortable="true">UPC</th>
-                        <th data-field="quantity" data-align="center" data-sortable="true">Cantidad</th>
+                        @if ( Auth::user()->pclient->useMode->id == 1 || 
+                            Auth::user()->pclient->useMode->id == 4)
+                            <th data-field="quantity" data-align="center" 
+                                data-sortable="true">Cantidad</th>
+                        @endif
                     </tr>
                 </thead>
                 @if (isset($ordenesd))
@@ -22,7 +26,10 @@
                         <tr>
                             <td>{{$order->name}}</td>
                             <td>{{$order->upc}}</td>
-                            <td>{{$order->quantity}}</td>
+                            @if ( Auth::user()->pclient->useMode->id == 1 || 
+                                Auth::user()->pclient->useMode->id == 4)                            
+                                <td>{{$order->quantity}}</td>
+                            @endif
                         </tr>                
                     @endforeach                
                 @endif

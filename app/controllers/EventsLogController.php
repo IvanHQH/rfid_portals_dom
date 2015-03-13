@@ -25,18 +25,41 @@ class EventsLogController extends BaseController {
      */
     public function store()
     {    
-        $id = OrdenEsM::idLastFolio(Input::get('folio'),Input::get('created_at'));   
-        if($id != 0){
-            $log = new EventsLog();
-            $log->event_id = $id;
-            $log->user_id = Input::get('user_id');
-            $log->type = Input::get('type');
-            $log->description = Input::get('description');
-            $log->created_at = Input::get('created_at');
-            $log->updated_at = Input::get('updated_at');
-            $log->customer_id = Input::get('customer_id');
-            $log->save(); 
-        }
+        $idUseMode = Pclient::find(Input::get('client_id'))->useMode->id;
+        switch($idUseMode){
+            case 1://folio comparison   
+                $id = OrdenEsM::idLastFolio(Input::get('folio'),
+                        Input::get('created_at'));   
+                if($id != 0){
+                    $log = new EventsLog();
+                    $log->event_id = $id;
+                    $log->user_id = Input::get('user_id');
+                    $log->type = Input::get('type');
+                    $log->description = Input::get('description');
+                    $log->created_at = Input::get('created_at');
+                    $log->updated_at = Input::get('updated_at');
+                    $log->pclient_id = Input::get('client_id');
+                    $log->save(); 
+                }                
+                return "ok";
+                break;
+            case 2://inventory place
+            case 3://inventory
+                $id = OrdenEsM::idLastClient(Input::get('client_id'),
+                        Input::get('created_at'));   
+                if($id != 0){
+                    $log = new EventsLog();
+                    $log->event_id = $id;
+                    $log->user_id = Input::get('user_id');
+                    $log->description = Input::get('description');
+                    $log->created_at = Input::get('created_at');
+                    $log->updated_at = Input::get('updated_at');
+                    $log->pclient_id = Input::get('client_id');
+                    $log->save(); 
+                }               
+                return "ok";
+                break;        
+        }        
     }    
     
     public function rows_data()
@@ -58,16 +81,26 @@ class EventsLogController extends BaseController {
     
     public function comparison_rows($id)
     {
-        $logs = EventsLog::where('event_id',$id)->get();
-        $log = $logs[0];
-        $comps = explode(',',$log->description);
         $rescomps = array();
-        $i = 0;
-        foreach($comps as $comp)
-        {
-            $rescomps[$i] = $comp;
-            $i = $i + 1;
+        if(EventsLog::where('event_id',$id)->count() >  0){
+            $logs = EventsLog::where('event_id',$id)->get();
+            $log = $logs[0];
+            $comps = explode(',',$log->description);            
+            $i = 0;
+            foreach($comps as $comp){
+                if( strlen($comp) > 0 ){
+                    $rescomps[$i] = $comp;
+                    $i = $i + 1;
+                }
+            }
+            $orderid = OrdenEsM::find($id);
+            $name = "";
+            if($orderid != NULL){
+                $name = $orderid->warehouse->name;   
+                //echo $name->id;die();
+            }
         }
-        return View::make('EventsLogTemplate',['rescomps' => $rescomps]);
+        return View::make('EventsLogTemplate',['rescomps' => $rescomps,
+            'description' => $name]); 
     }    
 }
