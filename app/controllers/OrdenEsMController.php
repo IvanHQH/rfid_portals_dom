@@ -165,6 +165,10 @@ class OrdenEsMController extends BaseController{
 	 */
 	public function destroy($id)
 	{
-
+            //echo "ok ->".$id;
+            DB::table('events_logs')->where('event_id',$id)->delete();
+            DB::table('orden_es_ds')->where('orden_es_m_id',$id)->delete();
+            DB::table('orden_es_ms')->where('id',$id)->delete();
+            return Redirect::to('/ordenesm');
 	}
 }

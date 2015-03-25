@@ -23,4 +23,9 @@ class Product extends BaseModel{
         return "";                
     }
     
+    public function warehouse()
+    {
+        return $this->belongsTo('Warehouse');    
+    }    
+    
 }

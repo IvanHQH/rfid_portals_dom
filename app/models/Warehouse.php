@@ -13,4 +13,5 @@
  */
 class Warehouse extends BaseModel{
     //put your code here
+      
 }

@@ -33,10 +33,7 @@
                                 <option>{{$client->name}}</option>
                             @endforeach                               
                         </select>                            
-                    </div>                                             
-                    <!--div style="margin-bottom: 25px" class="input-group">
-                        <p id="use_mode" style="float:left">Hola Mundo</p>
-                    </div-->                                                         
+                    </div>                                                                                                    
                     <div style="margin-top:10px" class="form-group">
                         <div class="col-md-12 control">
                             <button id="btn-login" type="btn btn-success" type="submit"
@@ -98,6 +95,17 @@
                         <button id="btn-signup" type="btn btn-success" type="submit"
                             class="btn btn-info">Sign Up</button>                        
                     </div></div>
+                <div class="form-group">
+                    <div class="col-md-12 control">
+                        <div style="border-top: 1px solid#888; 
+                             padding-top:15px; font-size:85%" >
+                        <a href="#" onClick="$('#signupbox').hide(); 
+                            $('#loginbox').show()">
+                            Login
+                        </a>
+                        </div>
+                    </div>
+                </div>                                                          
                 {{ Form::close() }}
         </div>
     </div>

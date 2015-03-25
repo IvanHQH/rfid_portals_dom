@@ -12,11 +12,12 @@
             @if ($idUseMode == 1 || $idUseMode == 4 )
                 <thead>
                     <tr>
-                        <th  data-align="center">UPC's</th>
-                        <th  data-align="center">Comp.</th> 
+                        <th  data-align="center">UPC</th>
+                        <th  data-align="center">Dif</th> 
                         <th  data-align="center" data-sortable="true">Fecha/Hora</th>
                         <th  data-align="left" data-sortable="true">Folio</th>
                         <th  data-align="center" data-sortable="true">Tipo</th>
+                        <th  data-align="center" data-sortable="true">X</th>
                     </tr>
                 </thead>
                 @foreach($ordern_es_ms as $order)
@@ -24,18 +25,24 @@
                         <td>
 	 		{{ Form::open(array('url' => 'showUseMode/' . $order->id, 'class' => 'pull-center')) }}
 				{{ Form::hidden('_method', 'GET') }}
-				{{ Form::submit('ver', array('class' => 'btn btn-default')) }}
+				{{ Form::submit('≡', array('class' => 'btn btn-default')) }}
 			{{ Form::close() }}                            
                         </td>
                         <td>
 	 		{{ Form::open(array('url' => 'comparison/' . $order->id, 'class' => 'pull-center')) }}
 				{{ Form::hidden('_method', 'GET') }}
-				{{ Form::submit('ver', array('class' => 'btn btn-default')) }}
+				{{ Form::submit('||', array('class' => 'btn btn-default')) }}
 			{{ Form::close() }}                         
                         </td>                        
                         <td>{{$order->created_at}}</td>
                         <td>{{$order->folio}}</td>
                         <td>{{$order->type}}</td>
+                        <td>
+	 		{{ Form::open(array('url' => 'ordenesm/' . $order->id, 'class' => 'pull-center')) }}
+				{{ Form::hidden('_method', 'DELETE') }}
+				{{ Form::submit('x', array('class' => 'btn btn-default')) }}
+			{{ Form::close() }}                         
+                        </td>                          
                     </tr>
                 @endforeach
                 </table>      

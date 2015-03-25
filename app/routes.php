@@ -67,6 +67,7 @@ Route::resource('usemode', 'UseModeController');
 Route::get('/logout','HomeController@logout');
 Route::post('/order_pending', 'OrdenEsMController@order_pending');
 Route::post('/update_ordenesd', 'OrdenEsDController@update_ordenesd');
+Route::post('/sync/data', 'SyncController@index_data');
 
 Route::group(array('before' => 'auth'), function()
 {    
@@ -91,11 +92,10 @@ Route::group(array('before' => 'auth'), function()
     Route::get('/dates/lastfolio', 'OrdenEsMController@dateslastfolio');
     Route::post('/writeJsonFolio', 'OrdenEsMController@writeJsonFolio');
     Route::post('/writeJsonTags', 'OrdenEsMController@writeJsonTags');
-
-    Route::get('/sync', 'SyncController@index');
-    Route::post('/sync', 'SyncController@postInventory');
+    
+    /*Route::post('/sync', 'SyncController@postInventory');
     Route::post('/sync/desktop', 'SyncController@postDesktop');
-    Route::post('/sync/postRead', 'SyncController@postRead');
+    Route::post('/sync/postRead', 'SyncController@postRead');*/
 
     Route::get('/events_logs/rows_data', 'EventsLogController@rows_data');
     Route::get('comparison/{id?}', 'EventsLogController@comparison_rows');    

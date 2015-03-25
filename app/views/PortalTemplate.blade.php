@@ -69,9 +69,9 @@
                     <tr>
                         <th data-field="name" data-align="left" data-sortable="true">Nombre</th>
                         <th data-field="upc" data-align="left" data-sortable="true">UPC</th>
-                        <th data-field="quantity" data-align="center" data-sortable="true">Cant. Leeida</th>
+                        <th data-field="quantityf" data-align="center" data-sortable="true">Cant. Leeida</th>
                         @if ( Auth::user()->pclient->useMode->id == 4 )
-                            <th data-field="quantityf" data-align="center" data-sortable="true">Cant.</th>                        
+                            <th data-field="quantity" data-align="center" data-sortable="true">Cant.</th>                        
                             <th data-field="ok" data-checkbox="true" data-sortable="true">OK</th>
                         @endif
                     </tr>

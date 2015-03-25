@@ -17,17 +17,35 @@ class SyncController extends BaseController {
      *
      * @return Response
      */
-    public function index() {
+    public function index() {            
+        $input = Input::All();        
         $result = array();
-        $result['products'] = Product::select('id', 'name', 'description','upc')->orderBy("id")->get();
-        //$result['warehouses'] = Warehouses::select('id', 'name', 'description','customer_id')->
-        //        where('customer_id',1)->orderBy("id")->get();
-        $result['warehouses'] = Warehouse::where('customer_id',1)->
-                select('id', 'name', 'description','customer_id')->get();
+        if(isset($input['pclient_id'])){       
+            return ":)";
+            $result['products'] = Product::select('id','pclient_id', 'name', 
+                    'description','upc','warehouse_id')->where('pclient_id',
+                    $input['pclient_id'])->orderBy("id")->get();
+            $result['warehouses'] = Warehouse::select('id', 'name', 
+                    'description')->get();
+        }
         return Response::json($result);
     }
     
-    public function postRead(){
+    public function index_data() {            
+        $input = Input::All();        
+        $result = array();        
+        if(isset($input['pclient_id'])){   
+            //return ":)";
+            $result['products'] = Product::select('id','pclient_id', 'name', 
+                    'description','upc','warehouse_id')->where('pclient_id',
+                    $input['pclient_id'])->orderBy("id")->get();
+            $result['warehouses'] = Warehouse::select('id', 'name', 
+                    'description')->get();
+        }
+        return Response::json($result);
+    }    
+    
+    /*public function postRead(){
         //@set_time_limit(0);
         // Process regular products
         return Response::json(Input::all());
@@ -64,6 +82,6 @@ class SyncController extends BaseController {
             });   
             return Response::json($epcs);
         }
-    }       
+    }*/       
     
 }

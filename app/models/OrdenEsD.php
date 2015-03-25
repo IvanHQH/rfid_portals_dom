@@ -16,16 +16,16 @@ class OrdenEsD extends BaseModel{
     
     public static function UPCsPending($idClient){
         $idOrderM = OrdenEsM::idPendingClient($idClient);
-        $folio = OrdenEsD::UPCsFolio($idOrderM);
+        $folioRead = OrdenEsD::UPCsFolio($idOrderM);
 
         $order = new OrdenEsM();
         $json_string = $order->contentFile();
-        $folioUpcs = json_decode($json_string);   
-        $folioUpcs = $folioUpcs->products;        
+        $folioFile = json_decode($json_string);   
+        $folioFile = $folioFile->products;        
 
-        foreach ($folio as $orderD)
+        foreach ($folioRead as $orderD)
         {
-            $prod = self::ProductFolio($orderD->upc,$folioUpcs);
+            $prod = self::ProductFolio($orderD->upc,$folioFile);
             if($prod != NULL){
                 $orderD->quantityf = $prod->quantity;
                 if ($orderD->quantity == $prod->quantity)          
@@ -36,9 +36,9 @@ class OrdenEsD extends BaseModel{
         }
         $found = false;
         if(Auth::user()->pclient->useMode->id == 4){            
-            foreach ($folioUpcs as $upcfolio){
+            foreach ($folioFile as $upcfolio){
                 $found = false;
-                foreach ($folio as $upcRead){
+                foreach ($folioRead as $upcRead){
                     if ($upcfolio->upc == $upcRead->upc){
                         $found = true;
                         break;
@@ -48,12 +48,12 @@ class OrdenEsD extends BaseModel{
                     $prod = new UPCRowView($upcfolio->upc,$upcfolio->name,$upcfolio->quantity);             
                     $prod->ok = false;
                     $prod->quantityf = 0;
-                    array_push($folio,$prod);
+                    array_push($folioRead,$prod);
                 }
             }
         }
-        sort($folio);
-        return $folio;
+        sort($folioRead);
+        return $folioRead;
     }    
     
     public static function UPCsFolio($idOrderM)
@@ -88,9 +88,9 @@ class OrdenEsD extends BaseModel{
         return $folio;        
     }
     
-    public static function ProductFolio($upc,$folioUpcs)
+    public static function ProductFolio($upc,$Upcs)
     {
-        foreach ($folioUpcs as $upcfolio){
+        foreach ($Upcs as $upcfolio){
             if($upc == $upcfolio->upc){                
                 return $upcfolio;
             }

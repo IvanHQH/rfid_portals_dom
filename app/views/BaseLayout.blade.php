@@ -29,9 +29,15 @@
                 <ul class="nav navbar-nav navbar-right">  
                     @if (Auth::user()->pclient->useMode->id == 1 ||
                         Auth::user()->pclient->useMode->id == 4)
-                        <li id="menu_dashboard"><a href="/showread">Lectura Portal</a></li>
+                        <li id="menu_dashboard"><a href="/showread">Lectura Antenas</a></li>
                     @endif
                     <li id="menu_ordenesm"><a href="/ordenesm">Lecturas</a></li>
+                    <li id="menu_add_asset"><a href="/add_asset">Agregar Activo</a></li>
+                    <li id="menu_list_assets"><a href="/list_assets">Listado Activos</a></li>
+                    @if (Auth::user()->pclient->useMode->id != 3)
+                    <li id="menu_add_zone"><a href="/add_asset">Agregar zona</a></li>
+                    <li id="menu_list_zones"><a href="/list_assets">Listado zonas</a></li>                    
+                    @endif
                     <li id="menu_logout"><a href="/logout">Cerrar Sesión</a></li>
                 </ul>
             </div>            
@@ -44,28 +50,30 @@
                 <ul class="nav nav-sidebar">
                     @if (Auth::user()->pclient->useMode->id == 1 ||
                         Auth::user()->pclient->useMode->id == 4)
-                        <li id="menu_dashboard"><a href="/showread">Lectura Portal</a></li>
+                        <li id="menu_dashboard"><a href="/showread">Lectura Antenas</a></li>
                     @endif
                     <li id="menu_ordenesm"><a href="/ordenesm">Lecturas</a></li>
                 </ul> 
-                @if (Auth::user()->pclient->useMode->id == 1||
-                        Auth::user()->pclient->useMode->id == 4)
-                    <h3 class="sub-header">Antenas</h3>
-                    <ul class="nav nav-sidebar" style="padding-left: 20px">
-                        <li id="antena_1">
-                            <button type="button" class="btn btn-default">
-                            <img src="/img/antena_rfid_mini.png"/>1</button>
-                        </li><br />
-                        <li id="antena_2">
-                            <button type="button" class="btn btn-default">
-                            <img src="/img/antena_rfid_mini.png"/>2</button>
-                        </li>                                        
-                    </ul>
-                @endif
+                
+                <h3 class="sub-header">Activos</h3>
+                <ul class="nav nav-sidebar">
+                    <li id="menu_add_asset"><a href="/add_asset">Agregar</a></li>
+                    <li id="menu_list_assets"><a href="/list_assets">Listado</a></li>
+                </ul>                 
+                
+                @if (Auth::user()->pclient->useMode->id != 3)
+                <h3 class="sub-header">Zonas</h3>
+                <ul class="nav nav-sidebar">
+                    <li id="menu_add_zone"><a href="/add_asset">Agregar</a></li>
+                    <li id="menu_list_zones"><a href="/list_assets">Listado</a></li>  
+                </ul> 
+                @endif                
+                
                 <h3 class="sub-header">Usuario</h3>
                 <ul class="nav nav-sidebar">
                     <li id="menu_logout"><a href="/logout">Cerrar Sesión</a></li>
-                </ul> 
+                </ul>                                 
+                
             </div>
             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                 <div class="box">
