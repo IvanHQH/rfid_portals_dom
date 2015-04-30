@@ -49,7 +49,7 @@ class CustomerController extends BaseController{
             $customer->created_at = $hour;
             $customer->updated_at = $hour;
             $customer->save();
-            return Redirect::to('/login');
+            return Redirect::to('/login');              
 	}
 
 	/**

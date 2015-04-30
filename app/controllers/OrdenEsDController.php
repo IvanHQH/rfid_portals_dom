@@ -21,9 +21,21 @@ class OrdenEsDController extends BaseController {
         public function index()
 	{
             $ordern_es_ds = array();
-            $ordern_es_ds['orden_es_ds'] = OrdenEsD::all();
+            $ordern_es_ds['orden_es_ds'] = OrdenEsD::all();                                    
             return Response::json($ordern_es_ds);
 	}           
+        
+        /*public function init_timer()
+        {
+            $base = new EventBase();
+            $n = 2;
+            $e = Event::timer($base, function($n) use (&$e) {
+                echo "$n seconds elapsed\n";
+                $e->delTimer();
+            }, $n);
+            $e->addTimer($n);
+            $base->loop();            
+        }*/
         
         public function row_data_pending()
         {
@@ -133,38 +145,40 @@ class OrdenEsDController extends BaseController {
 
 	}
                 
-        public function start_read()
-        {
-            $idCustomer = Auth::user()->pclient->id;
-            if(Variable::where('pclient_id',$idCustomer)
-                    ->where('name','read')->count() > 0)
-            {
-                $read = Variable::where('pclient_id',$idCustomer)
-                        ->where('name','read')->get();
-                $read = $read[0];
-                $read->value = "1";
-                $read->save();
-            }            
+        public function start_read_v1()
+        {            
+            $idClient = Auth::user()->pclient->id;
+            Variable::varReadTrue($idClient);
             $idUseMode = Auth::user()->pclient->useMode->id;
             switch($idUseMode){           
                 case 1://folio comparison                  
                     return View::make('PortalTemplate',['step' => 'show_read']);
                     break;          
-                case 4://folio comparison axa     
+                case 4://folio comparison axa                         
                     return View::make('PortalTemplate',['step' => 'refresh_read']);
                     break;
             }   
         }
                
+        public function store_orderm()
+        {
+            $order = new OrdenEsM();
+            $dateTime = date("Y-m-d H:i:s");
+            $order->folio = Input::get('folio');
+            $order->created_at = $dateTime;
+            $order->updated_at = $dateTime;            
+        }
+        
         public function refresh_read()
         {            
+            //self::init_timer();
             return View::make('PortalTemplate',['step' => 'refresh_read']);
         }
         
         public function show_read()
         {
             $idClient = Auth::user()->pclient->id;
-            $idPending = OrdenEsM::idPendingClient($idClient);
+            $idPending = OrdenEsM::idPendingClientWarehouse($idClient,0);
             if($idPending > 0)
                 return View::make('PortalTemplate',['step' => 'check']);
             else
@@ -174,7 +188,13 @@ class OrdenEsDController extends BaseController {
         public function checkfolio()
         {
             $messages = array();
-            $folio = Input::get('folio');
+            $idOrderm = OrdenEsM::idPendingClientWarehouse(Auth::user()->pclient->id, 0);
+            $orderm = OrdenEsM::find($idOrderm);
+            if(Auth::user()->pclient->useMode->id == 1){
+                $folio = Input::get('folio');
+            }
+            if(Auth::user()->pclient->useMode->id == 4)
+                $folio = $orderm->folio;            
             $type = Input::get('type');
             if($folio != null)
             {
@@ -198,15 +218,19 @@ class OrdenEsDController extends BaseController {
             else{
                 HomeController::set_no_read_web();
                 return View::make('PortalTemplate',['step' => "check"]);
-            }            
+            }          
         }               
         
         public function update_ordenesd()
         {            
             //return Input::get('idClient');
-            $idPending = OrdenEsM::idPendingClient(Input::get('client_id'));
+            $idPending = OrdenEsM::idPendingClientWarehouse(
+                    Input::get('client_id'),Input::get('warehouse_id'));
             if($idPending > 0)  
             {
+                $orderm = OrdenEsM::find($idPending);
+                $orderm->warehouse_id = Input::get('warehouse_id');
+                $orderm->save();
                 DB::table('orden_es_ds')->where('orden_es_m_id',
                         $idPending )->delete();
                 return 1;
@@ -227,12 +251,27 @@ class OrdenEsDController extends BaseController {
                 foreach ($redsUpcs as $upcRead){
                     if($upcRead->upc == $upcfolio->upc){                        
                         $find = true;
-                        if($upcRead->quantity != $upcfolio->quantity){
+                        if($upcRead->quantityf != $upcfolio->quantity){
                             $message = "[".$upcRead->upc."]"."[".$upcRead->name."]";
-                            if($upcRead->quantity < $upcfolio->quantity){                                
-                                $message = $message." hay solo ". $upcRead->quantity.
+                            if($upcRead->quantityf < $upcfolio->quantity){                                
+                                $message = $message." hay solo ". $upcRead->quantityf.
                                     " de tags leeidas se esperaban ".$upcfolio->quantity.",";
-                            }elseif($upcRead->quantity > $upcfolio->quantity){
+                            }elseif($upcRead->quantityf > $upcfolio->quantity){
+                                $message =$message. " hay ". $upcRead->quantity.
+                                    " en tags leeidas solo se esperaban ".$upcfolio->quantity.",";                          
+                            }
+                            $messages[$index] = $message;
+                            $index = $index + 1;
+                        }
+                        break;                foreach ($redsUpcs as $upcRead){
+                    if($upcRead->upc == $upcfolio->upc){                        
+                        $find = true;
+                        if($upcRead->quantityf != $upcfolio->quantity){
+                            $message = "[".$upcRead->upc."]"."[".$upcRead->name."]";
+                            if($upcRead->quantityf < $upcfolio->quantity){                                
+                                $message = $message." hay solo ". $upcRead->quantityf.
+                                    " de tags leeidas se esperaban ".$upcfolio->quantity.",";
+                            }elseif($upcRead->quantityf > $upcfolio->quantity){
                                 $message =$message. " hay ". $upcRead->quantity.
                                     " en tags leeidas solo se esperaban ".$upcfolio->quantity.",";                          
                             }
@@ -240,6 +279,8 @@ class OrdenEsDController extends BaseController {
                             $index = $index + 1;
                         }
                         break;
+                    }
+                }
                     }
                 }
                 if($find == false){

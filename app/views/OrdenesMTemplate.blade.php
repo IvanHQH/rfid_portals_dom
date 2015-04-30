@@ -25,23 +25,32 @@
                         <td>
 	 		{{ Form::open(array('url' => 'showUseMode/' . $order->id, 'class' => 'pull-center')) }}
 				{{ Form::hidden('_method', 'GET') }}
-				{{ Form::submit('≡', array('class' => 'btn btn-default')) }}
-			{{ Form::close() }}                            
+				{{ Form::submit('≡', array('class' => 'btn btn-info')) }}                                                           
+			{{ Form::close() }}                    
                         </td>
                         <td>
 	 		{{ Form::open(array('url' => 'comparison/' . $order->id, 'class' => 'pull-center')) }}
 				{{ Form::hidden('_method', 'GET') }}
-				{{ Form::submit('||', array('class' => 'btn btn-default')) }}
-			{{ Form::close() }}                         
+				{{ Form::submit('||', array('class' => 'btn btn-info')) }}
+			{{ Form::close() }}                        
                         </td>                        
                         <td>{{$order->created_at}}</td>
                         <td>{{$order->folio}}</td>
                         <td>{{$order->type}}</td>
-                        <td>
-	 		{{ Form::open(array('url' => 'ordenesm/' . $order->id, 'class' => 'pull-center')) }}
-				{{ Form::hidden('_method', 'DELETE') }}
-				{{ Form::submit('x', array('class' => 'btn btn-default')) }}
-			{{ Form::close() }}                         
+                        <td>               
+                        <div class="action-buttons">
+                            <span class="order-id" style="display: none">
+                                {{$order->id}}
+                            </span>                        
+                            <button class="btn btn-danger btn-sm action-delete" >
+                                    <span class="glyphicon glyphicon-remove">                                    
+                                    </span>
+                            </button>   
+                        </div>                                                                                            
+	 		<!--{{ Form::open(array('url' => '/ordenesm/delete/' . $order->id, 'class' => 'pull-center')) }}
+				{{ Form::hidden('_method', 'POST') }}
+				{{ Form::submit('X', array('class' => 'btn btn-danger btn-sm action-delete')) }}
+			{{ Form::close() }}    -->                         
                         </td>                          
                     </tr>
                 @endforeach
@@ -56,6 +65,7 @@
                         @if ($idUseMode == 2)
                             <th  data-align="left" data-sortable="true">Almacén</th>
                         @endif
+                        <th  data-align="center" data-sortable="true">X</th>
                     </tr>
                 </thead>
                 @foreach($ordern_es_ms as $order)
@@ -76,10 +86,45 @@
                         @if ($idUseMode == 2)
                             <td>{{$order->warehouse->name}}</td>
                         @endif
+                        <td>                          
+                            <span class="order-id" style="display:none">
+                                {{$order->id}}
+                            </span>                        
+                            <button class="btn btn-danger btn-sm action-delete" >
+                                    <span class="glyphicon glyphicon-remove">                                    
+                                    </span>
+                            </button>                        
+                        </td>                                                 
                     </tr>
                 @endforeach
                 </table>             
-            @endif             
+            @endif
         </div>
     </div>   
+@stop
+
+@section('scripts')
+<script>        
+    $(document).ready(function() {
+
+        $('#events-table').off('click', '.action-delete').on('click', '.action-delete', function(e) {
+            var o = $(this),
+            id = o.parents('div:first').find('span.order-id').text();
+            if (!confirm('Desea borrar la lectura?')){
+                    return false;
+            }else{
+                alert(id);
+            }
+            $.ajax({
+                    type: "POST",
+                    url: '{{ URL::to('/ordenesm/delete') }}' + '/' + id,
+                    success: function(data, textStatus, jqXHR) {
+                            dt.fnDraw();
+                    },
+                    dataType: 'json'
+            });
+            window.location.reload();
+        });           
+    });
+</script>
 @stop

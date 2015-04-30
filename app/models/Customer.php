@@ -12,5 +12,6 @@
  * @author Arellano
  */
 class Customer extends BaseModel{
-
+    use SoftDeletingTrait;
+    protected $dates = ['deleted_at'];    
 }

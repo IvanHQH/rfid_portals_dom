@@ -157,7 +157,8 @@
         rowStyle: function (row, index) {return {};},
 
         formatLoadingMessage: function () {
-            return 'Loading, please wait…';
+            //return 'Loading, please wait…';
+            return '';
         },
         formatRecordsPerPage: function (pageNumber) {
             return sprintf('%s records per page', pageNumber);

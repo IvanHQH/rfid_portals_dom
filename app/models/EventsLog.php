@@ -29,7 +29,7 @@ class EventsLog extends BaseModel {
             else $allmessage = $message;
         }
         $allmessage = "folio = ".$folio." , ".$allmessage;
-        $id = OrdenEsM::idPendingClient($idClient);
+        $id = OrdenEsM::idPendingClientWarehouse($idClient,0);
         if($id > 0){
             $dt = new DateTime();
             $datetime = $dt->format('Y-m-d H:i:s');

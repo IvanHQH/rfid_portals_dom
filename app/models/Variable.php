@@ -13,4 +13,16 @@
  */
 class Variable extends BaseModel{
     //put your code here
+    public static function varReadTrue($idClient) {                
+        if(Variable::where('pclient_id',$idClient)
+                ->where('name','read')->count() > 0)
+        {
+            $read = Variable::where('pclient_id',$idClient)
+                    ->where('name','read')->get();
+            $read = $read[0];
+            $read->value = "1";
+            $read->save();
+        }             
+        
+    }
 }

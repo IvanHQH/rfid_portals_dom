@@ -13,6 +13,9 @@
  */
 class Pclient extends BaseModel{
 
+    use SoftDeletingTrait;
+    protected $dates = ['deleted_at'];        
+    
     public static function idUseMode($useMode)
     { 
         //OrdenEsM::where('orden_es_m_id',$id)->get();

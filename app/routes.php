@@ -14,7 +14,6 @@
 Route::get('/', function()
 {
     return Redirect::to('login');
-    //return View::make('hello');
 });
 
 Route::post('login', function(){
@@ -23,14 +22,17 @@ Route::post('login', function(){
     else
     {
         $user = User::where('name',Input::get('name'))->take(1)->get();
-        if($user[0]->password == Input::get('password'))
-        {
-            Auth::loginUsingId($user[0]->id);
-            User::setCustomerSelect($user[0]->id, Input::get('nameClient'));
-            return Redirect::to('ordenesm');
-        }
-        else
-            return Redirect::to('login');        
+        /*if(Auth::id() == $user[0]->id)
+        {}
+        else{*/
+            if($user[0]->password == Input::get('password')){
+                Auth::loginUsingId($user[0]->id);
+                User::setCustomerSelect($user[0]->id, Input::get('nameClient'));
+                return Redirect::to('ordenesm');
+            }
+            else
+                return Redirect::to('login');                    
+        //}
     }
 });
 
@@ -63,44 +65,50 @@ Route::get('/reset_read','HomeController@reset_read');
 Route::resource('customer', 'CustomerController');
 Route::get('/test_conection','HomeController@test_conection');
 Route::resource('pclient', 'PclientController');
+
 Route::resource('usemode', 'UseModeController');
 Route::get('/logout','HomeController@logout');
 Route::post('/order_pending', 'OrdenEsMController@order_pending');
 Route::post('/update_ordenesd', 'OrdenEsDController@update_ordenesd');
-Route::post('/sync/data', 'SyncController@index_data');
+Route::resource('sync', 'SyncController');
+Route::post('/sync_data', 'SyncController@index_data');
+
+//Route::resource('user', 'UserController');
 
 Route::group(array('before' => 'auth'), function()
 {    
     Route::post('/test_get_product', 'HomeController@test_get_product');    
     Route::post('/add_product', 'HomeController@add_product');
-    Route::get('/variables/set_no_read_portal',
-            'HomeController@set_no_read_web');
+    Route::get('/variables/set_no_read_portal','HomeController@set_no_read_web');
 
     Route::get('/upc/data_pending', 'OrdenEsDController@row_data_pending');    
     
     Route::get('/upc/data/{id?}', 'OrdenEsDController@row_data');    
-    Route::post('/read/start_read', 'OrdenEsDController@start_read');
+    Route::post('/read/start_read_v1', 'OrdenEsDController@start_read_v1');
     Route::post('/read/show_read', 'OrdenEsDController@show_read');
     Route::post('/read/checkfolio', 'OrdenEsDController@checkfolio');
     Route::post('/read/refresh_read', 'OrdenEsDController@refresh_read');
 
     Route::get('/ordenesm',  'OrdenEsMController@getIndex');
     Route::get('/getIndexData',  'OrdenEsMController@getIndexData');
-
     Route::get('/showread', 'OrdenEsMController@showread');        
-
     Route::get('/dates/lastfolio', 'OrdenEsMController@dateslastfolio');
     Route::post('/writeJsonFolio', 'OrdenEsMController@writeJsonFolio');
     Route::post('/writeJsonTags', 'OrdenEsMController@writeJsonTags');
-    
-    /*Route::post('/sync', 'SyncController@postInventory');
-    Route::post('/sync/desktop', 'SyncController@postDesktop');
-    Route::post('/sync/postRead', 'SyncController@postRead');*/
-
+    Route::post('/read/start_read_v4', 'OrdenEsMController@start_read_v4');
+    Route::post('/ordenesm/delete/{id}', 'OrdenEsMController@delete');
+        
     Route::get('/events_logs/rows_data', 'EventsLogController@rows_data');
     Route::get('comparison/{id?}', 'EventsLogController@comparison_rows');    
     //showUseMode
     Route::get('showUseMode/{id?}', 'OrdenEsDController@showUseMode');
     Route::resource('product', 'ProductController');
+    Route::post('/product/index', 'ProductController@index');
+    Route::post('/product/{id?}', 'ProductController@store');
+    Route::get('/product/get/{id}', 'ProductController@getProduct');    
+    
+    Route::resource('warehouse', 'WarehouseController');
+    Route::post('/warehouse/{id?}', 'WarehouseController@store');
+    Route::get('/warehouse/get/{id}', 'WarehouseController@getWarehouse');    
 
 });

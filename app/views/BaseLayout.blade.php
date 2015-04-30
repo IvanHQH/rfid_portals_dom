@@ -32,11 +32,9 @@
                         <li id="menu_dashboard"><a href="/showread">Lectura Antenas</a></li>
                     @endif
                     <li id="menu_ordenesm"><a href="/ordenesm">Lecturas</a></li>
-                    <li id="menu_add_asset"><a href="/add_asset">Agregar Activo</a></li>
-                    <li id="menu_list_assets"><a href="/list_assets">Listado Activos</a></li>
+                    <li id="menu_list_assets"><a href="/product">Activos</a></li>
                     @if (Auth::user()->pclient->useMode->id != 3)
-                    <li id="menu_add_zone"><a href="/add_asset">Agregar zona</a></li>
-                    <li id="menu_list_zones"><a href="/list_assets">Listado zonas</a></li>                    
+                    <li id="menu_list_zones"><a href="/warehouse">Zonas</a></li>                    
                     @endif
                     <li id="menu_logout"><a href="/logout">Cerrar Sesión</a></li>
                 </ul>
@@ -55,19 +53,14 @@
                     <li id="menu_ordenesm"><a href="/ordenesm">Lecturas</a></li>
                 </ul> 
                 
-                <h3 class="sub-header">Activos</h3>
+                <h3 class="sub-header">Catálogos</h3>
                 <ul class="nav nav-sidebar">
-                    <li id="menu_add_asset"><a href="/add_asset">Agregar</a></li>
-                    <li id="menu_list_assets"><a href="/list_assets">Listado</a></li>
-                </ul>                 
-                
-                @if (Auth::user()->pclient->useMode->id != 3)
-                <h3 class="sub-header">Zonas</h3>
-                <ul class="nav nav-sidebar">
-                    <li id="menu_add_zone"><a href="/add_asset">Agregar</a></li>
-                    <li id="menu_list_zones"><a href="/list_assets">Listado</a></li>  
-                </ul> 
-                @endif                
+                    <li id="menu_list_assets"><a href="/product">Activos</a></li>
+                    @if (Auth::user()->pclient->useMode->id == 1 || 
+                        Auth::user()->pclient->useMode->id == 2)
+                        <li id="menu_list_warehouse"><a href="/warehouse">Zonas</a></li>  
+                    @endif                        
+                </ul>                                             
                 
                 <h3 class="sub-header">Usuario</h3>
                 <ul class="nav nav-sidebar">
@@ -84,10 +77,30 @@
     </div>    
     {{-- jQuery (necessary for Bootstrap's JavaScript plugins) --}}
     <script src="//code.jquery.com/jquery.js"></script>
+    
+    <div class="modal fade" id="smwModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="modalTitle">Modal Title</h4>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>    
+    
+    <!--@yield('javascripts')-->    
     @yield('scripts')
     {{-- Include all compiled plugins (below), or include individual files as needed --}}
     {{ HTML::script('assets/js/jquery.min.js') }}
     {{ HTML::script('assets/js/bootstrap.min.js') }}
     {{ HTML::script('assets/js/bootstrap-table.js') }}
+    {{ HTML::script('assets/js/functions.js') }}
   </body>
 </html>

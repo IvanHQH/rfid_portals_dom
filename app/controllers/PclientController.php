@@ -42,15 +42,46 @@ class PclientController  extends BaseController{
 	 */
 	public function store()
 	{
-            $hour = new DateTime('now');
-            $client = new Pclient();
-            $client->name = Input::get('clientName');
-            $client->logo = Input::get('Logo');
-            $client->created_at = $hour;
-            $client->updated_at = $hour;
-            $client->use_mode_id = Pclient::idUseMode(Input::get('useMode'));
-            $client->save();
-            return Redirect::to('/login');
+            $client = new Pclient;          
+            if(User::where('name',Input::get('user_name'))->where('password',
+                    Input::get('user_password'))->where('type',1)->count() > 0 ){
+                
+                    if(Pclient::where('name',Input::get('pclient_name'))->count() > 0)
+                    {
+                        return Response::json(array(
+                                'success' => false,
+                                'errors'  => "ya existe el cliente"                    
+                        ));                
+                    }                
+                
+                    $hour = new DateTime('now');                
+                    $client->name = Input::get('pclient_name');
+                    $client->created_at = $hour;
+                    $client->updated_at = $hour;
+                    $client->use_mode_id = Pclient::idUseMode(Input::get('pclient_use_mode'));
+                    $client->save();
+                    //create and save new variable of client
+                    $var = new Variable();
+                    $client = Pclient::where('name',Input::get('pclient_name'))->first();
+                    if($client != null){
+                        $var->pclient_id = $client->id;
+                        $var->name = 'read';
+                        $var->value = "0";
+                        $var->created_at = $hour;
+                        $var->updated_at = $hour;
+                        $var->save();
+                        //end create variable
+                        //return Response::json($client);
+                        return Response::json(array(
+                                'success' => true
+                        ));
+                    }
+            }  
+            return Response::json(array(
+                    'success' => false,
+                    'errors' => 'Usuario ó contraseña invalida'
+            ));
+            //return Response::json($client);
 	}
 
 	/**

@@ -8,8 +8,13 @@
             <td style="width: 50%">    
               @if (isset($step))              
                 @if ($step == 'start')
-                <form class="navbar-form navbar-left" role="form" method="post"
-                      action="/read/start_read">   
+                    @if ( Auth::user()->pclient->useMode->id == 1 )                
+                    <form class="navbar-form navbar-left" role="form" 
+                          method="post" action="/read/start_read_v1" >   
+                    @elseif (Auth::user()->pclient->useMode->id == 4)
+                    <form class="navbar-form navbar-left" role="form" 
+                          method="post" action="/read/start_read_v4" >                       
+                    @endif
                 @elseif ($step == 'show_read')
                 <form class="navbar-form navbar-left" role="form" method="post"
                       action="/read/show_read">             
@@ -17,18 +22,25 @@
                 <form class="navbar-form navbar-left" role="form" method="post"
                       action="/read/checkfolio">          
                 @endif
-                @if ($step == 'check')
-                  <div class="form-group">
-                    <input name="folio" type="text" class="form-control" placeholder="Folio">
-                  </div>                    
+                @if ($step == 'check')             
+                    @if ( Auth::user()->pclient->useMode->id == 1 ) 
+                    <div class="form-group">
+                      <input name="folio" type="text" class="form-control" placeholder="Folio1">
+                    </div>   
+                    @endif                
                     <select id="miselect" name="type" style="float:left" class="form-control">
                             <option>Entrada</option>
                             <option>Salida</option>
                     </select>    
-                    <button type="submit" class="btn btn-default">Comparar</button>
+                <button type="submit" class="btn btn-default">Comparar</button>
                 @endif
                 @if ($step == 'start')
-                    <button type="submit" class="btn btn-default">Iniciar</button>
+                    @if ( Auth::user()->pclient->useMode->id == 4 ) 
+                    <div class="form-group">
+                      <input name="folio" type="text" class="form-control" placeholder="Folio">
+                    </div>   
+                    @endif
+                  <button type="submit" class="btn btn-default">Iniciar</button>
                 @elseif ($step == 'show_read')
                     <button type="submit" class="btn btn-default">Ver</button>    
                 @elseif ($step == 'refresh_read')    
@@ -93,4 +105,21 @@
       </ul>
     </div>    
     @endif
+@stop
+@section('scripts')
+<script>
+    /*$(document).ready(function() {
+        alert('init');
+        function prepareModal(id) {               
+        }
+        
+        $('#add_client').on('click', function() {     
+            prepareModal(1);
+        });
+        
+        $('#add_user').on('click', function() {     
+            prepareModal(2);
+        });        
+    });*/  
+</script>  
 @stop

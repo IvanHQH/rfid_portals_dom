@@ -15,7 +15,7 @@ class OrdenEsD extends BaseModel{
     //put your code here
     
     public static function UPCsPending($idClient){
-        $idOrderM = OrdenEsM::idPendingClient($idClient);
+        $idOrderM = OrdenEsM::idPendingClientWarehouse($idClient,0);
         $folioRead = OrdenEsD::UPCsFolio($idOrderM);
 
         $order = new OrdenEsM();
@@ -23,35 +23,39 @@ class OrdenEsD extends BaseModel{
         $folioFile = json_decode($json_string);   
         $folioFile = $folioFile->products;        
 
-        foreach ($folioRead as $orderD)
+        //puts ok or error and indicates surplus product
+        foreach ($folioRead as $prodRead)
         {
-            $prod = self::ProductFolio($orderD->upc,$folioFile);
+            $prod = self::ProductFolio($prodRead->upc,$folioFile);
+            $prodRead->quantityf = $prodRead->quantity;
             if($prod != NULL){
-                $orderD->quantityf = $prod->quantity;
-                if ($orderD->quantity == $prod->quantity)          
-                    $orderD->ok = true;
-                else                                 
-                    $orderD->ok = false;    
+                $prodRead->quantity = $prod->quantity;                
             }
+            else
+               $prodRead->quantity = 0;
         }
         $found = false;
         if(Auth::user()->pclient->useMode->id == 4){            
-            foreach ($folioFile as $upcfolio){
+            foreach ($folioFile as $upcfile){
                 $found = false;
-                foreach ($folioRead as $upcRead){
-                    if ($upcfolio->upc == $upcRead->upc){
-                        $found = true;
-                        break;
-                    }
-                }
+                $prod = self::ProductFolio($upcfile->upc,$folioRead);
+                if($prod != NULL)
+                    $found = true;
                 if($found == false){
-                    $prod = new UPCRowView($upcfolio->upc,$upcfolio->name,$upcfolio->quantity);             
+                    $prod = new UPCRowView($upcfile->upc,$upcfile->name,$upcfile->quantity);             
                     $prod->ok = false;
                     $prod->quantityf = 0;
                     array_push($folioRead,$prod);
                 }
             }
         }
+        foreach ($folioRead as $prodRead)
+        {              
+            if ($prodRead->quantity == $prodRead->quantityf)          
+                $prodRead->ok = true;
+            else 
+                $prodRead->ok = false;    
+        }        
         sort($folioRead);
         return $folioRead;
     }    
@@ -79,8 +83,6 @@ class OrdenEsD extends BaseModel{
                     $name = Product::nameProduct($orderD->upc);
                     $pf = new UPCRowView($orderD->upc,$name,1);
                     array_push($folio,$pf);
-                    //$folio[$i] = $pf;
-                    //$i = $i + 1;
                 }else
                    $folio[$pos]->quantity = $folio[$pos]->quantity+1;              
             }

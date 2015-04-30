@@ -13,5 +13,6 @@
  */
 class Warehouse extends BaseModel{
     //put your code here
-      
+    use SoftDeletingTrait;
+    protected $dates = ['deleted_at'];          
 }

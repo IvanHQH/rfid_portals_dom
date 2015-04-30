@@ -42,7 +42,7 @@ class OrdenEsM extends BaseModel{
         return $id;        
     }
     
-    public static function idPendingClient($idClient)
+    public static function idPendingClientWarehouse($idClient,$idWarehouse)
     {
         //return $idClient;
         $count = OrdenEsM::where('pending',1)->where('pclient_id',
@@ -82,15 +82,16 @@ class OrdenEsM extends BaseModel{
                 Auth::user()->pclient_id)->orderBy('created_at', 'desc')->get();
         //$ordersM = OrdenEsM::all();
         $ordersMView = array();
-        $i = 0;        
+        //$i = 0;        
         foreach ($ordersM as $order)
         {
             if($order->type == 1)
                 $order->type = "Entrada";
             else
                 $order->type = "Salida";
-            $ordersMView[$i] = $order;
-            $i = $i + 1;
+            array_push($ordersMView,$order);
+            //$ordersMView[$i] = $order;
+            //$i = $i + 1;
         }
         return $ordersMView;
     }

@@ -13,6 +13,10 @@
  */
 class Product extends BaseModel{
     
+    use SoftDeletingTrait;
+
+    protected $dates = ['deleted_at'];    
+    
     public static function nameProduct($upc)
     {                
         $count = Product::where('upc',$upc)->count();

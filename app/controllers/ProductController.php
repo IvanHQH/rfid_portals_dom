@@ -19,9 +19,14 @@ class ProductController extends BaseController{
 	 */
 	public function index()
 	{
-            $product = array();
-            $product['products'] = Product::all();
-            return Response::json($product);
+            $products = Product::where('pclient_id',Auth::user()->pclient->id)->get();
+            $upc = new EPC();
+            $epcObj = new EPC();            
+            $upcSuggest = $epcObj->suggestUPC();         
+            //echo $upcSuggest;die();
+            $warehouses = Warehouse::where('pclient_id',Auth::user()->pclient->id)->get();
+            return View::make('ProductTemplate',['products' => $products,
+                'warehouses' => $warehouses,'upcSuggest' => $upcSuggest]);         
 	}
 
 	/**
@@ -41,11 +46,64 @@ class ProductController extends BaseController{
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store($id = 0)
 	{
-            Product::insert(Input::all());
+            if(Product::where('name',Input::get('product_name'))->count() > 0){
+                return Response::json(array(
+                        'success' => false,
+                        'errors'  => "ya existe el nombre"                    
+                )); 
+            }                    
+            
+            if(Product::where('upc',Input::get('product_upc'))->count() > 0){
+                return Response::json(array(
+                        'success' => false,
+                        'errors'  => "ya existe el UPC"                    
+                )); 
+            }             
+            
+            $input = Input::All();
+            if ($id == 0)
+                $product = new Product();
+            else {
+                $product = Product::find($id);
+                if (!$product) 
+                        return App::abort(403, 'Item not found');
+            }
+            $product->name = $input['product_name'];
+            $product->upc = $input['product_upc'];
+            $product->description = $input['product_description'];
+            $product->pclient_id =  Auth::user()->pclient->id;  
+            if(isset($input['product_warehouse']))
+                $product->warehouse_id = $input['product_warehouse'];
+            $product -> save();
+            
+            $epcObj = new EPC();
+            $refSerial = $epcObj->nextReferenceSerial();
+            //if($refSerial == $product->upc){
+                $pclient = Pclient::find(Auth::user()->pclient->id);
+                $pclient->reference_serial = $refSerial;
+                $pclient->save();                
+            //}
+            //echo "successful";die();
+            return Response::json(array(
+                    'success' => true,                   
+            ));                         
 	}
 
+        /*public function saveSerialUPC($refSerial){
+            $pclient = Pclient::find(Auth::user()->pclient->id);
+            $pclient->reference_serial = $refSerial;
+            $pclient->save();
+        } */
+
+        public function getProduct($id) {
+                $p = Product::find($id);
+                if ($p !== null) {
+                    return Response::json($p);
+                }
+        }        
+        
 	/**
 	 * Display the specified resource.
 	 *
@@ -57,8 +115,6 @@ class ProductController extends BaseController{
             $ordern_es_ms = array();
             $ordern_es_ms['orden_es_ms'] = OrdenEsM::all();
             return Response::json($ordern_es_ms);
-            //$product = Product::find($id);
-            //return Response::json($product);
 	}
 
 	/**
@@ -91,6 +147,11 @@ class ProductController extends BaseController{
 	 */
 	public function destroy($id)
 	{
-
+            $p = Product::find($id);
+            if ($p) {
+                    $p -> delete();
+            }
+            return Response::json(array('ok' => 'ok'));
 	}
+        
 }
