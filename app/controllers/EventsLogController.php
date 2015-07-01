@@ -65,7 +65,7 @@ class EventsLogController extends BaseController {
     public function rows_data()
     {
         $logs = array();
-        $i = 0;
+        //$i = 0;
         foreach (EventsLog::with('User')->where('customer_id',Auth::user()->customer_id)
                 ->orderBy('id', 'desc')->get() as $log)
         {
@@ -73,8 +73,9 @@ class EventsLogController extends BaseController {
             $newlog->name = $log->user->name;
             $newlog->description = $log->description;
             $newlog->created_at = $log->created_at;  
-            $logs[$i] = $newlog;
-            $i = $i + 1;
+            array_push($logs,$newlog);
+            /*$logs[$i] = $newlog;            
+            $i = $i + 1;*/
         }
         return $logs;
     }       
@@ -82,21 +83,24 @@ class EventsLogController extends BaseController {
     public function comparison_rows($id)
     {
         $rescomps = array();
-        if(EventsLog::where('event_id',$id)->count() >  0){
+
+        if(EventsLog::where('event_id',$id)->count() >  0){            
             $logs = EventsLog::where('event_id',$id)->get();
             $log = $logs[0];
             $comps = explode(',',$log->description);            
-            $i = 0;
+            //$i = 0;
             foreach($comps as $comp){
                 if( strlen($comp) > 0 ){
-                    $rescomps[$i] = $comp;
-                    $i = $i + 1;
+                    array_push($rescomps,$comp);
+                    //$rescomps[$i] = $comp;
+                    //$i = $i + 1;
                 }
             }
             $orderid = OrdenEsM::find($id);
             $name = "";
             if($orderid != NULL){
                 $name = $orderid->warehouse->name;   
+                //echo $orderid->warehouse;die();
                 //echo $name->id;die();
             }
         }

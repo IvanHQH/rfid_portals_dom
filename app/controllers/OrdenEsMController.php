@@ -23,7 +23,7 @@ class OrdenEsMController extends BaseController{
             $ordern_es_ms = array();
             $ordern_es_ms = OrdenEsM::indexAllForViewLayout();            
             return View::make('OrdenesMTemplate',['ordern_es_ms' => $ordern_es_ms,
-                'idUseMode' => Auth::user()->pclient->useMode->id]);
+                'idUseMode' => Auth::user()->pclient->use_mode_id]);
 	}
         
         public function getIndexData()
@@ -103,7 +103,7 @@ class OrdenEsMController extends BaseController{
                     $ordenM->created_at = $dateTime;
                     $ordenM->updated_at = $dateTime;                
                     $ordenM->save();
-                    $idUseMode = Auth::user()->pclient->useMode->id;                      
+                    $idUseMode = Auth::user()->pclient->use_mode_id;                      
                     return View::make('PortalTemplate',['step' => 'refresh_read']);
                 //});
             }
@@ -194,11 +194,11 @@ class OrdenEsMController extends BaseController{
             return Redirect::to('/ordenesm');
 	}*/
         
-        public function delete($id){
+        public function postDelete($id){
             //echo $id;die();
             DB::table('events_logs')->where('event_id',$id)->delete();
             DB::table('orden_es_ds')->where('orden_es_m_id',$id)->delete();
             DB::table('orden_es_ms')->where('id',$id)->delete();
-            return Redirect::to('/ordenesm');
+            return Response::json(array('ok' => 'ok'));
         }
 }

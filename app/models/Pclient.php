@@ -22,7 +22,8 @@ class Pclient extends BaseModel{
         $userMode = UseMode::where('name',$useMode)->get();
         return $userMode[0]->id;
     }
-    
+
+
     public function useMode()
     {
         return $this->belongsTo('UseMode');

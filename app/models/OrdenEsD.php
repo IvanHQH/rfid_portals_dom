@@ -35,7 +35,7 @@ class OrdenEsD extends BaseModel{
                $prodRead->quantity = 0;
         }
         $found = false;
-        if(Auth::user()->pclient->useMode->id == 4){            
+        if(Auth::user()->pclient->use_mode_id == 4){            
             foreach ($folioFile as $upcfile){
                 $found = false;
                 $prod = self::ProductFolio($upcfile->upc,$folioRead);
@@ -63,7 +63,6 @@ class OrdenEsD extends BaseModel{
     public static function UPCsFolio($idOrderM)
     {
         $ordersD = OrdenEsD::where('orden_es_m_id',$idOrderM)->get();
-        //$i = 0;
         $folio = array();
         foreach ($ordersD as $orderD)
         {

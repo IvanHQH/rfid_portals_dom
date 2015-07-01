@@ -16,6 +16,8 @@ Route::get('/', function()
     return Redirect::to('login');
 });
 
+Route::get('/template', 'HomeController@template');
+
 Route::post('login', function(){
     if(User::where('name',Input::get('name'))->count() == 0 )   
         return Redirect::to('login');
@@ -26,9 +28,12 @@ Route::post('login', function(){
         {}
         else{*/
             if($user[0]->password == Input::get('password')){
-                Auth::loginUsingId($user[0]->id);
-                User::setCustomerSelect($user[0]->id, Input::get('nameClient'));
-                return Redirect::to('ordenesm');
+                if(Pclient::where('name', Input::get('nameClient'))->count() > 0 ){
+                    Auth::loginUsingId($user[0]->id);
+                    User::setCustomerSelect($user[0]->id, Input::get('nameClient'));
+                    return Redirect::to('ordenesm');                    
+                }else 
+                    return Redirect::to('login');
             }
             else
                 return Redirect::to('login');                    
@@ -70,8 +75,10 @@ Route::resource('usemode', 'UseModeController');
 Route::get('/logout','HomeController@logout');
 Route::post('/order_pending', 'OrdenEsMController@order_pending');
 Route::post('/update_ordenesd', 'OrdenEsDController@update_ordenesd');
+Route::post('/update_ordenesd_v4', 'OrdenEsDController@update_ordenesd_v4');
 Route::resource('sync', 'SyncController');
 Route::post('/sync_data', 'SyncController@index_data');
+Route::post('/sync', 'SyncController@postInventory');
 
 //Route::resource('user', 'UserController');
 
@@ -96,7 +103,7 @@ Route::group(array('before' => 'auth'), function()
     Route::post('/writeJsonFolio', 'OrdenEsMController@writeJsonFolio');
     Route::post('/writeJsonTags', 'OrdenEsMController@writeJsonTags');
     Route::post('/read/start_read_v4', 'OrdenEsMController@start_read_v4');
-    Route::post('/ordenesm/delete/{id}', 'OrdenEsMController@delete');
+    Route::post('/ordenesm/delete/{id}', 'OrdenEsMController@postDelete');
         
     Route::get('/events_logs/rows_data', 'EventsLogController@rows_data');
     Route::get('comparison/{id?}', 'EventsLogController@comparison_rows');    
@@ -111,4 +118,23 @@ Route::group(array('before' => 'auth'), function()
     Route::post('/warehouse/{id?}', 'WarehouseController@store');
     Route::get('/warehouse/get/{id}', 'WarehouseController@getWarehouse');    
 
+    Route::get('/arching_inv_init', 'ArchingController@Inventory_Initial');
+    Route::get('/arching_inv_end/{id?}', 'ArchingController@Inventory_End');
+    Route::get('/arching_up_file/{inventories?}', 'ArchingController@Up_File');
+    Route::get('/arching_do/{params?}', 'ArchingController@Arching_Do');
+    
+    Route::post('/upload/{inventories?}','ArchingController@upload_file');
+    
+    /*Route::post('/upload/{id?}', function($id){
+         if(Input::hasFile('archivo')) {
+             if (Input::file('archivo')->isValid())
+             { 
+                echo $id;die();
+                $path = Input::file('archivo')->getRealPath(); 
+                Input::file('archivo')->move('/home/developer/Projects/RFID/laravel/public/','calibrate.txt');
+                //echo $path;die();
+             }             
+         }
+         link_to(URL::previous());         
+    });  */  
 });

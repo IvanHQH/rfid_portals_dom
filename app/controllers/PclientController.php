@@ -41,25 +41,27 @@ class PclientController  extends BaseController{
 	 * @return Response
 	 */
 	public function store()
-	{
+	{            
             $client = new Pclient;          
             if(User::where('name',Input::get('user_name'))->where('password',
-                    Input::get('user_password'))->where('type',1)->count() > 0 ){
-                
+                    Input::get('user_password'))->where('type',1)->count() > 0 ){                
                     if(Pclient::where('name',Input::get('pclient_name'))->count() > 0)
                     {
                         return Response::json(array(
                                 'success' => false,
                                 'errors'  => "ya existe el cliente"                    
                         ));                
-                    }                
-                
-                    $hour = new DateTime('now');                
+                    }                                                             
+                    $hour = new DateTime('now');                                 
                     $client->name = Input::get('pclient_name');
                     $client->created_at = $hour;
-                    $client->updated_at = $hour;
-                    $client->use_mode_id = Pclient::idUseMode(Input::get('pclient_use_mode'));
+                    $client->updated_at = $hour;                     
+
+                    $userMode = UseMode::where('name',Input::get('pclient_use_mode'))->get();
+                                                            
+                    $client->use_mode_id = $userMode[0]->id;                
                     $client->save();
+                                          
                     //create and save new variable of client
                     $var = new Variable();
                     $client = Pclient::where('name',Input::get('pclient_name'))->first();
@@ -79,7 +81,7 @@ class PclientController  extends BaseController{
             }  
             return Response::json(array(
                     'success' => false,
-                    'errors' => 'Usuario ó contraseña invalida'
+                    'errors' => 'Usuario ó contraseña de Super Usuario Invalida'
             ));
             //return Response::json($client);
 	}

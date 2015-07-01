@@ -516,7 +516,7 @@
         html = ['<div class="columns columns-' + this.options.toolbarAlign + ' btn-group pull-' + this.options.toolbarAlign + '">'];
 
         if (this.options.showRefresh) {
-            html.push(sprintf('<button class="btn btn-default" type="button" name="refresh" title="%s">',
+            html.push(sprintf('<button class="btn btn-default" type="button" name="refresh" id="refresh" title="%s">',
                 this.options.formatRefresh()),
                 '<i class="glyphicon glyphicon-refresh icon-refresh"></i>',
                 '</button>');

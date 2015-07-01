@@ -3,15 +3,15 @@
 @section ('content')
     <!-- No message comparison -->
     @if (!isset($messages)) 
-    <table style="width: 100%">
+    <table style="width: 100%" id="table_reads">
         <tr style="width: 100%">
             <td style="width: 50%">    
               @if (isset($step))              
                 @if ($step == 'start')
-                    @if ( Auth::user()->pclient->useMode->id == 1 )                
+                    @if ( Auth::user()->pclient->use_mode_id == 1 )                
                     <form class="navbar-form navbar-left" role="form" 
                           method="post" action="/read/start_read_v1" >   
-                    @elseif (Auth::user()->pclient->useMode->id == 4)
+                    @elseif (Auth::user()->pclient->use_mode_id == 4)
                     <form class="navbar-form navbar-left" role="form" 
                           method="post" action="/read/start_read_v4" >                       
                     @endif
@@ -23,9 +23,9 @@
                       action="/read/checkfolio">          
                 @endif
                 @if ($step == 'check')             
-                    @if ( Auth::user()->pclient->useMode->id == 1 ) 
+                    @if ( Auth::user()->pclient->use_mode_id == 1 ) 
                     <div class="form-group">
-                      <input name="folio" type="text" class="form-control" placeholder="Folio1">
+                      <input name="folio" type="text" class="form-control" placeholder="Folio">
                     </div>   
                     @endif                
                     <select id="miselect" name="type" style="float:left" class="form-control">
@@ -35,7 +35,7 @@
                 <button type="submit" class="btn btn-default">Comparar</button>
                 @endif
                 @if ($step == 'start')
-                    @if ( Auth::user()->pclient->useMode->id == 4 ) 
+                    @if ( Auth::user()->pclient->use_mode_id == 4 ) 
                     <div class="form-group">
                       <input name="folio" type="text" class="form-control" placeholder="Folio">
                     </div>   
@@ -43,11 +43,7 @@
                   <button type="submit" class="btn btn-default">Iniciar</button>
                 @elseif ($step == 'show_read')
                     <button type="submit" class="btn btn-default">Ver</button>    
-                @elseif ($step == 'refresh_read')    
-                    {{ Form::open(array('url' => '/read/refresh_read', 'class' => 'pull-center')) }}
-                        {{ Form::hidden('_method', 'POST') }}
-                        {{ Form::submit('Actualizar', array('class' => 'btn btn-default')) }}
-                    {{ Form::close() }}     
+                @elseif ($step == 'refresh_read')      
                     {{ Form::open(array('url' => '/read/checkfolio', 'class' => 'pull-center')) }}
                         {{ Form::hidden('_method', 'POST') }}
                         {{ Form::submit('Comparar', array('class' => 'btn btn-default')) }}
@@ -72,17 +68,17 @@
         <div class="table-responsive container" style="width: 100%; padding: 10px;">
             @if ($step == 'check' || $step == 'refresh_read')
             <table data-toggle="table" id="table-pagination" data-url="/upc/data_pending" 
-                data-pagination="true" data-search="true">           
+                data-pagination="true" data-search="true" data-show-refresh="true">           
             @else
             <table data-toggle="table" id="table-pagination" data-url="" 
-                data-pagination="true" data-search="true">                       
+                data-pagination="true" data-search="true" data-show-refresh="true">                       
             @endif
                 <thead>
                     <tr>
                         <th data-field="name" data-align="left" data-sortable="true">Nombre</th>
                         <th data-field="upc" data-align="left" data-sortable="true">UPC</th>
                         <th data-field="quantityf" data-align="center" data-sortable="true">Cant. Leeida</th>
-                        @if ( Auth::user()->pclient->useMode->id == 4 )
+                        @if ( Auth::user()->pclient->use_mode_id == 4 )
                             <th data-field="quantity" data-align="center" data-sortable="true">Cant.</th>                        
                             <th data-field="ok" data-checkbox="true" data-sortable="true">OK</th>
                         @endif
@@ -106,20 +102,28 @@
     </div>    
     @endif
 @stop
+
 @section('scripts')
 <script>
-    /*$(document).ready(function() {
-        alert('init');
-        function prepareModal(id) {               
-        }
+    /*var myVar = setInterval(function () {myTimer()}, 1000);
+    function myTimer() {
+        //alert("ok");
         
-        $('#add_client').on('click', function() {     
-            prepareModal(1);
-        });
-        
-        $('#add_user').on('click', function() {     
-            prepareModal(2);
-        });        
-    });*/  
+    }*/
+    /*var table = $('#table_reads').DataTable( {
+        ajax: "data.json"
+    } );*/
+$(document).ready(function() {
+   /* var table = $('#table_reads').DataTable( {
+        ajax: "data.json"    
+    } );*/
+    setInterval( function () {
+        //alert("ok");
+        //table.ajax.reload();
+        $("#refresh").click();
+        //var refresh = document.getElementsByTagName('refresh');
+        //refresh[0].click();
+    }, 1000 );     
+});   
 </script>  
 @stop

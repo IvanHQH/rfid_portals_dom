@@ -23,19 +23,22 @@
                 <img src="/img/grupo_hqh_logo.png"></td>
             </div>
             <div class="navbar-header" style="margin-left: 10px;margin-top: 10px;color: white">
-                {{Auth::user()->pclient->name}} | {{Auth::user()->pclient->useMode->name}}
+                {{Auth::user()->pclient->name}}
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">  
-                    @if (Auth::user()->pclient->useMode->id == 1 ||
-                        Auth::user()->pclient->useMode->id == 4)
+                    @if (Auth::user()->pclient->use_mode_id == 1 ||
+                        Auth::user()->pclient->use_mode_id == 4)
                         <li id="menu_dashboard"><a href="/showread">Lectura Antenas</a></li>
                     @endif
                     <li id="menu_ordenesm"><a href="/ordenesm">Lecturas</a></li>
                     <li id="menu_list_assets"><a href="/product">Activos</a></li>
-                    @if (Auth::user()->pclient->useMode->id != 3)
+                    @if (Auth::user()->pclient->use_mode_id != 3)
                     <li id="menu_list_zones"><a href="/warehouse">Zonas</a></li>                    
                     @endif
+                    @if (Auth::user()->pclient->use_mode_id == 3)
+                        <li id="menu_list_zones"><a href="/arching_inv_init">Arqueo</a></li>                      
+                    @endif                    
                     <li id="menu_logout"><a href="/logout">Cerrar Sesión</a></li>
                 </ul>
             </div>            
@@ -46,8 +49,8 @@
             <div class="col-sm-3 col-md-2 sidebar">
                 <h3 class="sub-header">Principal</h3>
                 <ul class="nav nav-sidebar">
-                    @if (Auth::user()->pclient->useMode->id == 1 ||
-                        Auth::user()->pclient->useMode->id == 4)
+                    @if (Auth::user()->pclient->use_mode_id == 1 ||
+                        Auth::user()->pclient->use_mode_id == 4)
                         <li id="menu_dashboard"><a href="/showread">Lectura Antenas</a></li>
                     @endif
                     <li id="menu_ordenesm"><a href="/ordenesm">Lecturas</a></li>
@@ -56,17 +59,21 @@
                 <h3 class="sub-header">Catálogos</h3>
                 <ul class="nav nav-sidebar">
                     <li id="menu_list_assets"><a href="/product">Activos</a></li>
-                    @if (Auth::user()->pclient->useMode->id == 1 || 
-                        Auth::user()->pclient->useMode->id == 2)
+                    @if (Auth::user()->pclient->use_mode_id == 1 || 
+                        Auth::user()->pclient->use_mode_id == 2)
                         <li id="menu_list_warehouse"><a href="/warehouse">Zonas</a></li>  
                     @endif                        
                 </ul>                                             
-                
+                @if (Auth::user()->pclient->use_mode_id == 3)
+                    <h3 class="sub-header">Inventario</h3>
+                    <ul class="nav nav-sidebar">
+                        <li id="menu_arching"><a href="/arching_inv_init">Arqueo</a></li>
+                    </ul>                      
+                @endif
                 <h3 class="sub-header">Usuario</h3>
                 <ul class="nav nav-sidebar">
                     <li id="menu_logout"><a href="/logout">Cerrar Sesión</a></li>
-                </ul>                                 
-                
+                </ul>                                                                            
             </div>
             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                 <div class="box">
@@ -94,6 +101,23 @@
             </div>
         </div>
     </div>    
+    
+    <div class="modal fade" id="smwModalTrace" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="modalTitle">Trazabilidad</h4>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>       
     
     <!--@yield('javascripts')-->    
     @yield('scripts')

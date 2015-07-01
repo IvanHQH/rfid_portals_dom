@@ -10,7 +10,9 @@
                 @endif
             </div>    
             <table data-toggle="table" id="table-pagination"  
-                   data-pagination="true" data-search="true" style="background-color: #ffffff">            
+                   data-pagination="true" data-search="true" 
+                   style="background-color: #ffffff"
+                   class="table table-striped">            
                 <thead>
                     <tr>
                         <th data-field="description" data-align="left" data-sortable="true">Descripción</th>

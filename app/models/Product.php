@@ -29,7 +29,13 @@ class Product extends BaseModel{
     
     public function warehouse()
     {
-        return $this->belongsTo('Warehouse');    
+        return $this->belongsTo('Warehouse');
     }    
+    
+    public function traceabilitym()
+    {
+        return $this->belongsTo('TraceabilityM');
+        //return $this->hasMany('TraceabilityM');
+    } 
     
 }

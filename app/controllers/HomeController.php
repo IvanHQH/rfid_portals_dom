@@ -14,6 +14,18 @@ class HomeController extends BaseController {
 	|	Route::get('/', 'HomeController@showWelcome');
 	|
 	*/    
+        var $rows;
+    
+    
+        public function template()
+        {
+            return View::make('Template');            
+        }
+        
+        public function admin()
+        {          
+            return View::make('AdminTemplate');
+        }    
     
         public function doLogin()
         {
@@ -76,51 +88,11 @@ class HomeController extends BaseController {
             }
         }             
                         
-        public function test()
-        {    
-        $idClient = 6;
-        $idOrderM = OrdenEsM::idPendingClientWarehouse($idClient,0);
-        $folioRead = OrdenEsD::UPCsFolio($idOrderM);
-
-        $order = new OrdenEsM();
-        $json_string = $order->contentFile();
-        $folioFile = json_decode($json_string);   
-        $folioFile = $folioFile->products;        
-
-        //puts ok or error and indicates surplus product
-        foreach ($folioRead as $prodRead)
-        {
-            $prod = self::ProductFolio($prodRead->upc,$folioFile);
-            $prodRead->quantityf = $prodRead->quantity;
-            if($prod != NULL){
-                $prodRead->quantity = $prod->quantity;                
-                if ($prodRead->quantity == $prod->quantity)          
-                    $prodRead->ok = true;
-                else 
-                    $prodRead->ok = false;    
-            }
-            else
-               $prodRead->quantity = 0;
-        }
-        echo 
-        $found = false;
-        if(Auth::user()->pclient->useMode->id == 4){            
-            foreach ($folioFile as $upcfile){
-                $found = false;
-                $prod = self::ProductFolio($upcfile->upc,$folioRead);
-                if($prod != NULL)
-                    $found = true;
-                if($found == false){
-                    $prod = new UPCRowView($upcfile->upc,$upcfile->name,$upcfile->quantity);             
-                    $prod->ok = false;
-                    $prod->quantityf = 0;
-                    array_push($folioRead,$prod);
-                }
-            }
-        }
-        sort($folioRead);
-        return $folioRead;          
-        }        
+    public function test()
+    {                                 
+        $arching = new Arching();
+        echo "ok1";
+    }            
         
     public static function ProductFolio($upc,$folioUpcs)
     {        
@@ -189,4 +161,6 @@ class HomeController extends BaseController {
         {
             return "ok";
         }
+        
+
 }

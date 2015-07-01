@@ -58,7 +58,8 @@ class OrdenEsM extends BaseModel{
     
     public static function indexAllForViewLayout()
     {
-        $id = Auth::user()->pclient->useMode->id;
+        $id = Auth::user()->pclient->use_mode_id;
+        //echo Auth::user()->pclient->name;die();
         $ordersM = array();
         switch($id)
         {
@@ -68,6 +69,7 @@ class OrdenEsM extends BaseModel{
                 break;
             case 2://inventory place
             case 3://inventory
+            case 5://inventory
                 $ordersM = OrdenEsM::where('pclient_id',
                         Auth::user()->pclient->id)->orderBy('created_at',
                                 'desc')->get();
@@ -128,6 +130,16 @@ class OrdenEsM extends BaseModel{
         return 0;
     }
     
+    public static function getProduct($idOrder,$upc)
+    {
+        $ordenesd = OrdenEsD::UPCsFolio($idOrder);
+        foreach ($ordenesd as $product) {
+            if($product->upc == $upc)
+                return $product;
+        }
+        return null;
+    }
+    
     public static function idLastClient($idClient,$dateTime)
     {
         $orders = OrdenEsM::where('pclient_id',$idClient)->where('created_at',
@@ -147,6 +159,6 @@ class OrdenEsM extends BaseModel{
     public function warehouse()
     {
         return $this->belongsTo('Warehouse');    
-    }
+    }    
     
 }

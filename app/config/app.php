@@ -94,7 +94,7 @@ return array(
 	*/
 
 	'providers' => array(
-
+                'Maatwebsite\Excel\ExcelServiceProvider',
 		'Illuminate\Foundation\Providers\ArtisanServiceProvider',
 		'Illuminate\Auth\AuthServiceProvider',
 		'Illuminate\Cache\CacheServiceProvider',
@@ -121,9 +121,10 @@ return array(
 		'Illuminate\Validation\ValidationServiceProvider',
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
+                
 
-	),
-
+	),        
+    
 	/*
 	|--------------------------------------------------------------------------
 	| Service Provider Manifest
@@ -149,7 +150,7 @@ return array(
 	*/
 
 	'aliases' => array(
-
+                'Excel'           => 'Maatwebsite\Excel\Facades\Excel',
 		'App'             => 'Illuminate\Support\Facades\App',
 		'Artisan'         => 'Illuminate\Support\Facades\Artisan',
 		'Auth'            => 'Illuminate\Support\Facades\Auth',

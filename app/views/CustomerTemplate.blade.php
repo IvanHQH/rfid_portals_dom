@@ -1,8 +1,10 @@
 @extends ('CustomerLayout')
 
 @section('content')
+<div class="logo" align="center" style="margin-top:10px;">
+    <img src="/img/grupo_hqh_logo.png"></div>
 <div class="container">     
-    <div id="loginbox" style="margin-top:50px;" 
+    <div id="loginbox" style="margin-top:25px;" 
          class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">                    
         <div class="panel panel-info" >
             <div class="panel-heading">
@@ -26,13 +28,16 @@
                                name="password" placeholder="Contraseña" value="" >
                     </div>
                     <div style="margin-bottom: 25px" class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon-barcode"></i></span>
-                        <select id="miselect" name="nameClient" 
+                        <span class="input-group-addon"><i class="glyphicon-barcode">                            
+                            </i></span>
+                        <input id="nameClient" type="text" class="form-control" 
+                               name="nameClient" placeholder="Nombre Cliente" value="" >                        
+                        <!--select id="miselect" name="nameClient" 
                                 class="form-control" style="float:right">
                             @foreach($clients as $client)
                                 <option>{{$client->name}}</option>
                             @endforeach                               
-                        </select>                            
+                        </select-->                            
                     </div>                                                                                                    
                     <div style="margin-top:10px" class="form-group">
                         <div class="col-md-12 control">
@@ -73,8 +78,7 @@
                 </select>                            
             </div>           
         </form>
-    </div>   
-    
+    </div>       
     <div style="display: none;" id="add-user">
         <form role="form">
             <div class="form-group">
@@ -94,11 +98,13 @@
             </div>           
             <div class="form-group">
                 <label for="cliente_name">Cliente</label>
-                <select id="client_name" class="form-control" style="float:right">
+                <input id="client_name" type="text" class="form-control" 
+                       name="client_name" placeholder="Nombre Cliente" value="" >                 
+                <!--select id="client_name" class="form-control" style="float:right">
                     @foreach($clients as $client)
                         <option>{{$client->name}}</option>
                     @endforeach                               
-                </select>                            
+                </select-->                            
             </div>              
         </form>
     </div>    
@@ -168,10 +174,8 @@
                     },
                     dataType: 'json',
                 });
-            });            
-            
-        }
-        
+            });                        
+        }        
         $('#add_client').on('click', function() {     
             prepareModal(1);
         });

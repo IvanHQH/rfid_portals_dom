@@ -25,8 +25,13 @@ class ProductController extends BaseController{
             $upcSuggest = $epcObj->suggestUPC();         
             //echo $upcSuggest;die();
             $warehouses = Warehouse::where('pclient_id',Auth::user()->pclient->id)->get();
-            return View::make('ProductTemplate',['products' => $products,
-                'warehouses' => $warehouses,'upcSuggest' => $upcSuggest]);         
+            $users = User::where('pclient_id',Auth::user()->pclient->id)->get();
+            return View::make('ProductTemplate',[
+                'products' => $products,
+                'warehouses' => $warehouses,
+                'upcSuggest' => $upcSuggest,
+                'users' => $users
+                ]);         
 	}
 
 	/**
@@ -47,28 +52,38 @@ class ProductController extends BaseController{
 	 * @return Response
 	 */
 	public function store($id = 0)
-	{
-            if(Product::where('name',Input::get('product_name'))->count() > 0){
-                return Response::json(array(
-                        'success' => false,
-                        'errors'  => "ya existe el nombre"                    
-                )); 
-            }                    
-            
-            if(Product::where('upc',Input::get('product_upc'))->count() > 0){
-                return Response::json(array(
-                        'success' => false,
-                        'errors'  => "ya existe el UPC"                    
-                )); 
-            }             
-            
+	{                      
             $input = Input::All();
+            $validarName = false;
+            $validarUpc = false;
             if ($id == 0)
-                $product = new Product();
+                $product = new Product();                    
             else {
                 $product = Product::find($id);
+                if($product->name == $input['product_name'])
+                    $validarName = false;
+                if($product->upc = $input['product_upc'])
+                    $validarUpc = false;
                 if (!$product) 
                         return App::abort(403, 'Item not found');
+            }
+            if($validarName == true)
+            {
+                if(Product::where('name',Input::get('product_name'))->count() > 0){
+                    return Response::json(array(
+                            'success' => false,
+                            'errors'  => "ya existe el nombre"                    
+                    )); 
+                }                    
+            }    
+            if($validarUpc == true)
+            {            
+                if(Product::where('upc',Input::get('product_upc'))->count() > 0){
+                    return Response::json(array(
+                            'success' => false,
+                            'errors'  => "ya existe el UPC"                    
+                    )); 
+                }    
             }
             $product->name = $input['product_name'];
             $product->upc = $input['product_upc'];
@@ -77,6 +92,26 @@ class ProductController extends BaseController{
             if(isset($input['product_warehouse']))
                 $product->warehouse_id = $input['product_warehouse'];
             $product -> save();
+            
+            ///vcesion traceability
+            if(Auth::user()->pclient->use_mode_id == 5){
+                $trace = new TraceabilityM();
+                $p = Product::where('upc',$product->upc)->
+                        where('pclient_id',Auth::user()->pclient->id)->first();
+                $trace->product_id = $p->id;
+                if(isset($input['user_name'])){
+                    //$user = User::where('name',$input['user_name'])->fisrt();
+                    //$trace->user_id = $user->id;
+                    $trace->user_id = 1;
+                }                    
+                if(isset($input['created_at']))  { 
+                     $trace->created_at = $input['created_at'];
+                     if ($id == 0)
+                        $trace->updated_at = $input['created_at'];
+                }
+                $trace->save();
+            }
+            ///            
             
             $epcObj = new EPC();
             $refSerial = $epcObj->nextReferenceSerial();
@@ -98,10 +133,23 @@ class ProductController extends BaseController{
         } */
 
         public function getProduct($id) {
-                $p = Product::find($id);
-                if ($p !== null) {
-                    return Response::json($p);
+            $p = Product::find($id);
+            if ($p !== null) {
+                if(Auth::user()->pclient->use_mode_id == 5)//trazabilidad                                    
+                {
+                    $tm = TraceabilityM::where('product_id',$id)->first();
+                    return Response::json(
+                            array(                                                                
+                                'name' => $p->name,
+                                'upc' => $p->upc,
+                                'description' => $p->description,                              
+                                'created_at' => (string)$tm->created_at,
+                                'user_name' => $tm->user->name
+                                ));
                 }
+                else    
+                    return Response::json($p);
+            }
         }        
         
 	/**

@@ -5,22 +5,37 @@
 <div class="content-container">        
     <div class="table-responsive container" style="width: 100%; padding: 10px;">  
         <button class="btn btn-sm" data-toggle="modal" data-target="#smwModal" id="add_product">Agregar</button>
-        <table id="events-table" data-toggle="table" 
-            data-pagination="true" data-search="true" data-show-columns = "true">     
+        <table id="events-table" data-toggle="table" data-pagination="true" 
+               data-search="true" data-show-columns = "true"  
+               class="table table-striped">     
             <thead>
                 <tr>
                     <th data-align="left">Nombre</th>
                     <th data-align="left">Descripción</th> 
                     <th data-align="center">UPC</th>
-                    <th data-align="center"></th>
+                    @if (Auth::user()->pclient->use_mode_id == 5)
+                    <th data-align="center">Traz.</th>
+                    @endif                                            
+                    <th data-align="center">Editar | Eliminar</th>                    
                 </tr>
             </thead>
             @foreach($products as $product)
                 <tr>
                     <td>{{$product->name}}</td>
-                    <td>{{$product->description}}</td>
+                    <td>{{$product->description}}</td>                    
                     <td>{{$product->upc}}</td>
-                    <td>  
+                    @if (Auth::user()->pclient->use_mode_id == 5)
+                    <td>
+                        <span class="order-id" style="display:none">
+                            {{$product->id}}
+                        </span>                        
+                        <button class="btn btn-info btn-sm action-trace" >
+                            <span class="glyphicon glyphicon-edit">                                    
+                            </span>
+                        </button>                        
+                    </td>                        
+                    @endif    
+                    <td>
                     <div class="action-buttons">
                         <span class="product-id" style="display:none">
                             {{$product->id}}
@@ -55,9 +70,10 @@
             </div>            
             <div class="form-group">
                 <label for="product_description">Descripción del producto</label>
-                <textarea id="product_description" placeholder="Descripción del producto" class="form-control"></textarea>
+                <textarea id="product_description" placeholder="Descripción del producto" 
+                          class="form-control"></textarea>
             </div>
-            @if (Auth::user()->pclient->useMode->id == 2)            
+            @if (Auth::user()->pclient->use_mode_id == 2)            
                 <div class="form-group">
                     <label for="product_warehouse">Zona</label>
                     <select id="product_warehouse" class="form-control">                            
@@ -67,6 +83,41 @@
                     </select>
                 </div>
             @endif
+            @if (Auth::user()->pclient->use_mode_id == 5)            
+                <div class="form-group">
+                    <label for="user_name">Instalo Usuario</label>
+                    <select id="user_name" class="form-control">                            
+                        @foreach($users as $user)
+                            <option>{{$user->name}}</option>
+                        @endforeach                              
+                    </select>                    
+                </div>
+                <div class="form-group">
+                    <label for="created_at">Fecha/Hora Instalación</label>
+                    <input id="created_at" class="form-control">                    
+                </div>            
+            @endif            
+        </form>
+    </div>    
+    
+    <div style="display: none;" id="add-trace">
+        <form role="form">
+            <div class="form-group">
+                <label>Usuario 1 / 2009-01-21 18:54</label>
+                <input class="form-control" readonly value="descripcion">
+            </div>
+            <div class="form-group">
+                <label>Usuario 1 / 2009-01-21 18:54</label>  
+                <input class="form-control" readonly value="descripcion">
+            </div>            
+            <div class="form-group">
+                <label>Usuario 1 / 2009-01-21 18:54</label>
+                <input class="form-control" readonly value="descripcion">
+            </div>          
+            <div class="form-group">
+                <label>Agrgar a Historial:</label>
+                <input class="form-control">                    
+            </div>              
         </form>
     </div>    
     
@@ -86,7 +137,6 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
-            //alert('load products');
             //setActiveMenu('menu_list_assets');
             function prepareModal(id) {
                 $('#smwModal').find('#modalTitle').html('Agregar Producto');
@@ -102,6 +152,8 @@
                                 $('#smwModal').find('.modal-body').html($('#add-product').html())
                                     .find('#product_name').val(d.name).end()
                                     .find('#product_upc').val(d.upc).end()
+                                    .find('#user_name').val(d.user_name).end()
+                                    .find('#created_at').val(d.created_at).end()
                                     .find('#product_description').val(d.description).end()
                                     .data('id', d.id)
                                 ;
@@ -110,14 +162,16 @@
                         });
                 }
                 else {
-                    $('#smwModal').find('.modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button><button type="button" class="btn btn-primary" id="add-product-btn">Agregar Producto</button>');
+                    $('#smwModal').find('.modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button><button type="button" class="btn btn-primary" id="add-product-btn">Agregar Producto</button>');                
                 }
                 $('#smwModal').off('click', '#add-product-btn').on('click', '#add-product-btn', function() {                    
                     var data = {
                         product_name: $('#smwModal').find('#product_name').val(),
                         product_upc: $('#smwModal').find('#product_upc').val(),
                         product_description: $('#smwModal').find('#product_description').val(),
-                        product_warehouse: $('#smwModal').find('#product_warehouse').val()
+                        product_warehouse: $('#smwModal').find('#product_warehouse').val(),
+                        user_name: $('#smwModal').find('#user_name').val(),
+                        created_at: $('#smwModal').find('#created_at').val()
                     }, 
                     id = $('#smwModal').find('.modal-body').data('id');
                         $.ajax({
@@ -130,9 +184,7 @@
                                     dt.fnDraw();    */
                                     window.location.reload();
                                 }
-                                else{
-                                    alert(data.errors);
-                                }                        
+                                else{alert(data.errors);}                        
                             },
                             dataType: 'json'
                         });
@@ -140,9 +192,21 @@
                 });
             }
 
+            function prepareModalTrace() {
+                //alert("ok");
+                $('#smwModal').find('#modalTitle').html('Trazabilidad');
+                $('#smwModal').find('.modal-body').html($('#add-trace').html());
+                $('#smwModal').find('.modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button><button type="button" class="btn btn-primary" id="add-product-btn">Agregar Producto</button>');                                
+            }
+
             $('#add_product').on('click', function() {
                 //alert('add product');
-                prepareModal(0);
+                prepareModal(0);                
+            });
+
+            $('#events-table').off('click', '.action-trace').on('click', '.action-trace', function(e) {
+                    prepareModalTrace();
+                    $('#smwModal').modal();
             });
 
             $('#events-table').off('click', '.action-edit').on('click', '.action-edit', function(e) {
@@ -151,6 +215,8 @@
                     prepareModal(id);
                     $('#smwModal').modal();         
                     //window.location.reload();
+                    var input = document.getElementById('product_upc');
+                    input.setAttribute('readonly', 'readonly');   
             });
 
             $('#events-table').off('click', '.action-delete').on('click', '.action-delete', function(e) {
@@ -167,6 +233,8 @@
                             dataType: 'json'
                     });
                     window.location.reload();
+                    window.location.reload();
+                    //$("#refresh").click();
             });
         });
     </script>
