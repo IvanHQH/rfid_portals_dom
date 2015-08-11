@@ -22,7 +22,8 @@ class ArchingController extends BaseController{
         public  function index()
         {
             $ordern_es_ms = array();
-            $ordern_es_ms = OrdenEsM::indexAllForViewLayout();     
+            $ordern_es_ms = DB::select(
+                'call get_orden_es_ms('.Auth::user()->pclient->id.')');     
             $step = 'inv_init';        
             return View::make('ArchingTemplate',['ordern_es_ms' => $ordern_es_ms,
                 'idUseMode' => Auth::user()->pclient->use_mode_id,
@@ -32,7 +33,8 @@ class ArchingController extends BaseController{
         public  function Inventory_Initial()
         {
             $ordern_es_ms = array();
-            $ordern_es_ms = OrdenEsM::indexAllForViewLayout();     
+            $ordern_es_ms = DB::select(
+                'call get_orden_es_ms('.Auth::user()->pclient->id.')');     
             $step = 'inv_init';        
             return View::make('ArchingTemplate',['ordern_es_ms' => $ordern_es_ms,
                 'idUseMode' => Auth::user()->pclient->use_mode_id,
@@ -42,11 +44,13 @@ class ArchingController extends BaseController{
         public  function Inventory_End($id)
         {
             $ordern_es_ms = array();
-            $ordern_es_ms = OrdenEsM::indexAllForViewLayout(); 
+            $ordern_es_ms = DB::select(
+                'call get_orden_es_ms('.Auth::user()->pclient->id.')');  
             $order = OrdenEsM::find($id);
-            //echo $order->created_at;
-            //die();
-            $inv_init = (string)$order->created_at;
+            
+            $date = new DateTime((string)$order->created_at);
+            $inv_init = $date->format('d-m-Y H:i:s');         
+            
             $step = 'inv_end';        
             return View::make('ArchingTemplate',['ordern_es_ms' => $ordern_es_ms,
                 'idUseMode' => Auth::user()->pclient->use_mode_id,
@@ -59,10 +63,13 @@ class ArchingController extends BaseController{
             $elements = explode("+", $inventories);
             if(count($elements) == 2){
                 $order = OrdenEsM::find($elements[1]);
-                $inv_end = (string)$order->created_at;
+                $date = new DateTime((string)$order->created_at);
+                $inv_end = $date->format('d-m-Y H:i:s');                    
                 $order = OrdenEsM::find($elements[0]);
-                $inv_init = (string)$order->created_at;
-                return View::make('ArchingTemplate',
+                $date = new DateTime((string)$order->created_at);
+                $inv_init = $date->format('d-m-Y H:i:s');                 
+                
+                return View::make('ArchingTemplate',                        
                 ['step' => $step,'inv_init'=>$inv_init,'inv_end'=>$inv_end,
                         'inv_init_id'=>$elements[0],
                         'inv_end_id'=>$elements[1]]);                
@@ -81,12 +88,14 @@ class ArchingController extends BaseController{
                    $file = Input::file('archivo')->getClientOriginalName(); 
                    Input::file('archivo')->move($this->path,$file);
                    if(count($elements) == 2){                    
-                       $order = OrdenEsM::find($elements[1]);
-                       $inv_end = (string)$order->created_at;
-                       $order = OrdenEsM::find($elements[0]);
-                       $inv_init = (string)$order->created_at;
-                       return View::make('ArchingTemplate',
-                       ['step' => $step,
+                        $order = OrdenEsM::find($elements[1]);                       
+                        $date = new DateTime((string)$order->created_at);
+                        $inv_end = $date->format('d-m-Y H:i:s');                                                    
+                        $order = OrdenEsM::find($elements[0]);                       
+                        $date = new DateTime((string)$order->created_at);
+                        $inv_init = $date->format('d-m-Y H:i:s');                                                    
+                        return View::make('ArchingTemplate',
+                        ['step' => $step,
                                'inv_init'=>$inv_init,
                                'inv_end'=>$inv_end,
                                'inv_init_id'=>$elements[0],
@@ -146,7 +155,9 @@ class ArchingController extends BaseController{
                 }
                 catch (Exception $e)
                 {
-                    return Redirect::back();  
+                    $idInvInit = OrdenEsM::idOrderM($inv_init_dt); 
+                    $idInvEnd = OrdenEsM::idOrderM($inv_end_dt);     
+                    return Redirect::to("arching_up_file/".$idInvInit."+".$idInvEnd);  
                 }
                 $archings = $arch->Calculating_Arching($inv_init_dt,$inv_end_dt,$pathFile);
                 return View::make('ArchingTemplate',

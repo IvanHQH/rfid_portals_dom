@@ -62,49 +62,59 @@ class EventsLogController extends BaseController {
         }        
     }    
     
-    public function rows_data()
-    {
-        $logs = array();
-        //$i = 0;
-        foreach (EventsLog::with('User')->where('customer_id',Auth::user()->customer_id)
-                ->orderBy('id', 'desc')->get() as $log)
-        {
-            $newlog = new EventsLog();
-            $newlog->name = $log->user->name;
-            $newlog->description = $log->description;
-            $newlog->created_at = $log->created_at;  
-            array_push($logs,$newlog);
-            /*$logs[$i] = $newlog;            
-            $i = $i + 1;*/
-        }
-        return $logs;
-    }       
+    /*
+     * there is two returns
+     * - rescomps when there are not information of accessing or Missing
+     * - $rescompsExce and $rescompsMiss when there are information of 
+     *      accessing or Missing
+     */
     
-    public function comparison_rows($id)
+    public function excess_missing_order($id)
     {
         $rescomps = array();
-
+        $rescompsExce = array();
+        $rescompsMiss = array();
+        $nextExce = false;
+        $nextMiss = false;
+        $name = "";
         if(EventsLog::where('event_id',$id)->count() >  0){            
             $logs = EventsLog::where('event_id',$id)->get();
             $log = $logs[0];
             $comps = explode(',',$log->description);            
-            //$i = 0;
             foreach($comps as $comp){
                 if( strlen($comp) > 0 ){
-                    array_push($rescomps,$comp);
-                    //$rescomps[$i] = $comp;
-                    //$i = $i + 1;
+                    if($comp == "**Excedentes:"){
+                        $nextMiss = false;
+                        $nextExce = true;    
+                    }
+                    if($comp == "**Faltantes:"){
+                        $nextMiss = true;
+                        $nextExce = false;
+                    }
+                    if($nextExce){
+                        if($comp != "**Excedentes:")
+                            array_push($rescompsExce,$comp);
+                    }
+                    if($nextMiss){
+                        if($comp != "**Faltantes:")
+                            array_push($rescompsMiss,$comp);
+                    }
+                    if($nextExce == false && $nextMiss == false){
+                        array_push($rescomps,$comp);
+                    }
                 }
             }
-            $orderid = OrdenEsM::find($id);
-            $name = "";
+            $orderid = OrdenEsM::find($id);            
             if($orderid != NULL){
                 $name = $orderid->warehouse->name;   
-                //echo $orderid->warehouse;die();
-                //echo $name->id;die();
             }
         }
-        return View::make('EventsLogTemplate',['rescomps' => $rescomps,
-            'description' => $name]); 
+        if(count($rescomps) > 0){
+            return View::make('EventsLogTemplate',['rescomps' => $rescomps,
+                'description' => $name]); 
+        }else{
+            return View::make('EventsLogTemplate',['rescompsExce' => $rescompsExce,
+                'rescompsMiss' => $rescompsMiss,'description' => $name]);             
+        }
     }    
 }

@@ -20,8 +20,8 @@ class Arching extends BaseModel {
         
         public function Calculating_Arching($inv_init_dt,$inv_end_dt,$file_path)
         {            
-            $idInvInit = self::idOrderM($inv_init_dt); 
-            $idInvEnd = self::idOrderM($inv_end_dt);
+            $idInvInit = OrdenEsM::idOrderM($inv_init_dt); 
+            $idInvEnd = OrdenEsM::idOrderM($inv_end_dt);
             $archings = array();
             if($file_path != null)
             {
@@ -106,16 +106,6 @@ class Arching extends BaseModel {
             }                        
             return $archings;
         }        
-
-
-        public function idOrderM($creted_at)
-        {
-            $order_m = OrdenEsM::where('created_at',$creted_at)->take(1)->get();
-            if($order_m != null)
-                return $order_m[0]->id;
-            else
-                return -1;
-        }
         
         public function arrayProductsPOS($filePath)
         {

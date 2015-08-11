@@ -1,11 +1,17 @@
 @extends ('BaseLayout')
 
 @section ('content')    
-<div class="tab-header">Zonas</div>
-<div class="content-container">        
-    <div class="table-responsive container" style="width: 100%; padding: 10px;">  
-        <button class="btn btn-sm" data-toggle="modal" data-target="#smwModal" id="add_warehouse">Agregar</button>
-        <table id="events-table" data-toggle="table" 
+<div class="col-lg-12">
+    <h3 class="page-header">Zonas</h1>
+</div>			
+<div class="col-md-12">
+    <div class="panel panel-info">
+        <div class="panel-heading">       
+            <button class="btn btn-default" data-toggle="modal" 
+                    data-target="#smwModal" id="add_warehouse">Agregar</button>
+	</div>        
+	<div class="panel-body">         
+            <table id="events-table" data-toggle="table" 
             data-pagination="true" data-search="true" data-show-columns = "true">     
             <thead>
                 <tr>
@@ -36,7 +42,9 @@
                 </tr>
             @endforeach                
         </table>                 
-    </div>
+        </div>                           
+    </div>				
+</div>
     
     <div style="display: none;" id="add-warehouse">
         <form role="form">
@@ -51,7 +59,7 @@
         </form>
     </div>    
     
-</div>   
+ 
 <div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false">
 	<div class="modal-header">
 		<h1>Procesando...</h1>
@@ -130,8 +138,8 @@
                 if (!confirm('Desea borrar la zona?'))
                         return false;
                 $.ajax({
-                        type: "DELETE",
-                        url: '{{ URL::to('/warehouse') }}' + '/' + id,
+                        type: "POST",
+                        url: '{{ URL::to('/warehouse/delete') }}' + '/' + id,
                         success: function(data, textStatus, jqXHR) {
                                 dt.fnDraw();
                         },

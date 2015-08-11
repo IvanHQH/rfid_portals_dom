@@ -12,6 +12,7 @@
  * @author Arellano
  */
 class WarehouseController extends BaseController{
+    
     //put your code here
     public function index() {        
         $warehouses = Warehouse::where('pclient_id',Auth::user()->pclient->id)->get();
@@ -49,7 +50,7 @@ class WarehouseController extends BaseController{
             }
     }         
     
-    public function destroy($id)
+    public function postDelete($id)
     {
         $w = Warehouse::find($id);
         if ($w) 

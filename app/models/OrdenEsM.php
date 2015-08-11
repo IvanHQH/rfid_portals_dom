@@ -54,54 +54,12 @@ class OrdenEsM extends BaseModel{
             $id = $orderM[0]->id;
         }
         return $id;
-    }            
-    
-    public static function indexAllForViewLayout()
-    {
-        $id = Auth::user()->pclient->use_mode_id;
-        //echo Auth::user()->pclient->name;die();
-        $ordersM = array();
-        switch($id)
-        {
-            case 1://folio comparison
-            case 4://folio comparison axa
-                $ordersM = self::foliocomparisonrows();
-                break;
-            case 2://inventory place
-            case 3://inventory
-            case 5://inventory
-                $ordersM = OrdenEsM::where('pclient_id',
-                        Auth::user()->pclient->id)->orderBy('created_at',
-                                'desc')->get();
-                break;
-        }
-        return $ordersM;
-    }    
-    
-    public static function foliocomparisonrows()
-    {        
-        $ordersM = OrdenEsM::where('pclient_id',
-                Auth::user()->pclient_id)->orderBy('created_at', 'desc')->get();
-        //$ordersM = OrdenEsM::all();
-        $ordersMView = array();
-        //$i = 0;        
-        foreach ($ordersM as $order)
-        {
-            if($order->type == 1)
-                $order->type = "Entrada";
-            else
-                $order->type = "Salida";
-            array_push($ordersMView,$order);
-            //$ordersMView[$i] = $order;
-            //$i = $i + 1;
-        }
-        return $ordersMView;
-    }
+    }                
 
     /*
      * update the number folio and put as no pending 
      */        
-    public static function updateOrderFolio($folio,$type)
+    public static function updateOrderFolio($folio)
     {
         $count = OrdenEsM::where('pending',1)->count();
         if($count > 0)
@@ -111,10 +69,6 @@ class OrdenEsM extends BaseModel{
             $orderM = $orderM[0];
             $orderM->folio = $folio;
             $orderM->pending = 0;
-            if($type == 'Entrada')
-                $orderM->type = 1;
-            else
-                $orderM->type = 0;
             $orderM->save();
         }
         else{}
@@ -159,6 +113,65 @@ class OrdenEsM extends BaseModel{
     public function warehouse()
     {
         return $this->belongsTo('Warehouse');    
+    }    
+    
+    public static function idOrderM($created_at)
+    {
+        $date = new DateTime((string)$created_at);
+        $created_at_f = $date->format('Y-m-d H:i:s');         
+        $order_m = OrdenEsM::where('created_at',$created_at_f)->take(1)->get();
+        if($order_m != null)
+            return $order_m[0]->id;
+        else
+            return -1;
+    }    
+    
+    public function createReadsXls($idOrderM)
+    {        
+        Excel::create('FirstExcel', function($excel) use($idOrderM) {
+
+            $excel->sheet('Sheetname', function($sheet) use($idOrderM) {
+
+            $ref = Variable::where('pclient_id',1)->where('name','Ref')->get();
+            $ref = $ref[0];
+            $ref = $ref->value;
+            $ship= Variable::where('pclient_id',1)->where('name','ShipCarrier')->get();
+            $ship = $ship[0];
+            $ship = $ship->value;
+            $lot= Variable::where('pclient_id',1)->where('name','Lot')->get();
+            $lot = $lot[0];  
+            $lot = $lot->value;
+            $serial= Variable::where('pclient_id',1)->where('name','Serial')->get();
+            $serial = $serial[0];  
+            $serial = $serial->value;
+            $locat= Variable::where('pclient_id',1)->where('name','LocationField1')->get();
+            $locat = $locat[0];        
+            $locat = $locat->value;                
+
+            $sheet->appendRow(2, array(
+                ''
+            ));              
+
+            $sheet->appendRow(2, array(
+                'Ref #', 'PO #','ShipCarrier','Notes','SKU','QTY','Lot#','Serial#',
+                'Expiration Date','LocationField1','LocationField2','LocationField3',
+                'LocationField4','Cost','VarUoMavg'
+            ));          
+            $redsUpcs = OrdenEsD::where('orden_es_m_id',$idOrderM)->get();
+            $i = 3;
+            foreach ($redsUpcs as $upcRead){                      
+                $sheet->appendRow($i, array(
+                    $ref,'', $ship,'',$upcRead->upc,$upcRead->quantityf,$lot,$serial,'',$locat                        
+                ));
+                $i = $i + 1;
+            }                   
+            });         
+        })->download('xls');   
+        /*Excel::create('FirstExcel', function($excel) {
+
+            // Call writer methods here
+
+        })->export('xls');*/
     }    
     
 }

@@ -1,11 +1,12 @@
 @extends ('BaseLayout')
 
 @section ('content')     
-    <div class="content-container">        
-        <div class="table-responsive container" style="width: 100%; padding: 10px;">  
-            <div class="alert alert-success" id="events-result" data-es="Aquí se muestra el resultado del evento">
-                Lecturas
-            </div>
+<div class="col-lg-12">
+    <h3 class="page-header">Lecturas</h1>
+</div>
+<div class="col-md-12">
+    <div class="panel panel-info">
+            <div class="panel-body">
             <table id="events-table" data-toggle="table" data-pagination="true" 
                    data-search="true" data-show-columns = "true" 
                    class="table table-striped">     
@@ -13,7 +14,7 @@
             @if ($idUseMode == 1 || $idUseMode == 4 )
                 <thead>
                     <tr>
-                        <th  data-align="center">UPC</th>
+                        <th  data-align="center">Activos</th>
                         <th  data-align="center">Dif</th> 
                         <th  data-align="center" data-sortable="true">Fecha / Hora</th>
                         <th  data-align="left" data-sortable="true">Folio</th>
@@ -24,13 +25,13 @@
                 @foreach($ordern_es_ms as $order)
                     <tr>
                         <td>
-	 		{{ Form::open(array('url' => 'showUseMode/' . $order->id, 'class' => 'pull-center')) }}
+	 		{{ Form::open(array('url' => 'showAssetsUseMode/' . $order->id, 'class' => 'pull-center')) }}
 				{{ Form::hidden('_method', 'GET') }}
-				{{ Form::submit('≡', array('class' => 'btn btn-info')) }}                                                           
+				{{ Form::submit('=', array('class' => 'btn btn-info')) }}                                                           
 			{{ Form::close() }}                    
                         </td>
                         <td>
-	 		{{ Form::open(array('url' => 'comparison/' . $order->id, 'class' => 'pull-center')) }}
+	 		{{ Form::open(array('url' => 'excess_missing_order/' . $order->id, 'class' => 'pull-center')) }}
 				{{ Form::hidden('_method', 'GET') }}
 				{{ Form::submit('||', array('class' => 'btn btn-info')) }}
 			{{ Form::close() }}                        
@@ -44,14 +45,10 @@
                                 {{$order->id}}
                             </span>                        
                             <button class="btn btn-danger btn-sm action-delete" >
-                                    <span class="glyphicon glyphicon-remove">                                    
-                                    </span>
+                                <span class="glyphicon glyphicon-remove">                                    
+                                </span>
                             </button>   
-                        </div>                                                                                            
-	 		<!--{{ Form::open(array('url' => '/ordenesm/delete/' . $order->id, 'class' => 'pull-center')) }}
-				{{ Form::hidden('_method', 'POST') }}
-				{{ Form::submit('X', array('class' => 'btn btn-danger btn-sm action-delete')) }}
-			{{ Form::close() }}    -->                         
+                        </div>                                                                                                                
                         </td>                          
                     </tr>
                 @endforeach
@@ -60,7 +57,7 @@
             @elseif ($idUseMode == 2 || $idUseMode == 3 || $idUseMode == 5)
                 <thead>
                     <tr>
-                        <th  data-align="center">UPC's</th>
+                        <th  data-align="center">Activos</th>
                         @if ($idUseMode != 5 && $idUseMode != 3)
                             <th  data-align="center">Comp.</th> 
                         @endif           
@@ -74,14 +71,14 @@
                 @foreach($ordern_es_ms as $order)
                     <tr>
                         <td>
-	 		{{ Form::open(array('url' => 'showUseMode/' . $order->id, 'class' => 'pull-center')) }}
+	 		{{ Form::open(array('url' => 'showAssetsUseMode/' . $order->id, 'class' => 'pull-center')) }}
 				{{ Form::hidden('_method', 'GET') }}
 				{{ Form::submit('ver', array('class' => 'btn btn-default')) }}
 			{{ Form::close() }}                            
                         </td>
                         @if ($idUseMode != 5 && $idUseMode != 3)
                         <td>                        
-	 		{{ Form::open(array('url' => 'comparison/' . $order->id, 'class' => 'pull-center')) }}
+	 		{{ Form::open(array('url' => 'excess_missing_order/' . $order->id, 'class' => 'pull-center')) }}
 				{{ Form::hidden('_method', 'GET') }}
 				{{ Form::submit('ver', array('class' => 'btn btn-default')) }}
 			{{ Form::close() }}                                                                                            
@@ -89,7 +86,7 @@
                         @endif
                         <td>{{$order->created_at}}</td>
                         @if ($idUseMode == 2 || $idUseMode == 5)
-                            <td>{{$order->warehouse->name}}</td>
+                            <td>{{$order->warehouse_name}}</td>
                         @endif
                         <td>            
                         <div class="action-buttons">
@@ -106,8 +103,9 @@
                 @endforeach
                 </table>             
             @endif
-        </div>
-    </div>   
+        </div>                           
+    </div>				
+</div>
 @stop
 
 @section('scripts')

@@ -41,7 +41,6 @@ class UserController extends BaseController {
                     $user->upc = $input['upc'];//return 2;
                 }                
                 $pclient = Pclient::where('name',Input::get('client_name'))->first();
-                //return Response::json($pclient);
                 if($pclient != null){
                     $user->pclient_id = $pclient->id;
                     $user->save();     
@@ -53,6 +52,5 @@ class UserController extends BaseController {
             return Response::json(array(
                     'success' => false
             ));
-            //return Response::json($client);
 	}    
 }

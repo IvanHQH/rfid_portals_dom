@@ -1,59 +1,72 @@
 @extends ('BaseLayout')
 
 @section ('content')    
-<div class="tab-header">Productos</div>
-<div class="content-container">        
-    <div class="table-responsive container" style="width: 100%; padding: 10px;">  
-        <button class="btn btn-sm" data-toggle="modal" data-target="#smwModal" id="add_product">Agregar</button>
-        <table id="events-table" data-toggle="table" data-pagination="true" 
-               data-search="true" data-show-columns = "true"  
-               class="table table-striped">     
-            <thead>
-                <tr>
-                    <th data-align="left">Nombre</th>
-                    <th data-align="left">Descripción</th> 
-                    <th data-align="center">UPC</th>
-                    @if (Auth::user()->pclient->use_mode_id == 5)
-                    <th data-align="center">Traz.</th>
-                    @endif                                            
-                    <th data-align="center">Editar | Eliminar</th>                    
-                </tr>
-            </thead>
-            @foreach($products as $product)
-                <tr>
-                    <td>{{$product->name}}</td>
-                    <td>{{$product->description}}</td>                    
-                    <td>{{$product->upc}}</td>
-                    @if (Auth::user()->pclient->use_mode_id == 5)
-                    <td>
-                        <span class="order-id" style="display:none">
-                            {{$product->id}}
-                        </span>                        
-                        <button class="btn btn-info btn-sm action-trace" >
-                            <span class="glyphicon glyphicon-edit">                                    
+<div class="col-lg-12">
+	<h3 class="page-header">Activos</h3>
+</div>			
+<div class="col-md-12">
+    <div class="panel panel-info">
+        <div class="panel-heading">     
+            <button class="btn btn-default" data-toggle="modal" 
+                data-target="#smwModal" id="add_product">Agregar</button>
+	</div>            
+	<div class="panel-body">          
+            <table id="events-table" data-toggle="table" data-pagination="true" 
+                   data-search="true" data-show-columns = "true"  
+                   class="table table-striped">     
+                <thead>
+                    <tr>
+                        <th data-align="left">Nombre</th>
+                        @if (Auth::user()->pclient->commerce_type_id == 1)
+                            <th data-align="left">Descripción<br> <font size = "2"> 
+                                Marca | Color | Talla</font></th>   
+                        @else
+                            <th data-align="left">Descripción</th>                       
+                        @endif
+                        <th data-align="center">UPC</th>
+                        @if (Auth::user()->pclient->use_mode_id == 5)
+                        <th data-align="center">Traz.</th>
+                        @endif                                            
+                        <th data-align="center">Editar | Eliminar</th>                    
+                    </tr>
+                </thead>
+                @foreach($products as $product)
+                    <tr>
+                        <td>{{$product->name}}</td>
+                        <td>{{$product->description}}</td>                    
+                        <td>{{$product->upc}}</td>
+                        @if (Auth::user()->pclient->use_mode_id == 5)
+                        <td>
+                            <span class="order-id" style="display:none">
+                                {{$product->id}}
+                            </span>                        
+                            <button class="btn btn-info btn-sm action-trace" >
+                                <span class="glyphicon glyphicon-edit">                                    
+                                </span>
+                            </button>                        
+                        </td>                        
+                        @endif    
+                        <td>
+                        <div class="action-buttons">
+                            <span class="product-id" style="display:none">
+                                {{$product->id}}
                             </span>
-                        </button>                        
-                    </td>                        
-                    @endif    
-                    <td>
-                    <div class="action-buttons">
-                        <span class="product-id" style="display:none">
-                            {{$product->id}}
-                        </span>
-                        <button class="btn btn-info btn-sm action-edit" >
-                            <span class="glyphicon glyphicon-pencil">                                    
-                            </span>
-                        </button>
-                        <button class="btn btn-danger btn-sm action-delete" >
-                            <span class="glyphicon glyphicon-remove">                                    
-                            </span>
-                        </button>
-                    </div>                       
-                    </td>                                                
-                </tr>
-            @endforeach                
-        </table>                 
-    </div>
+                            <button class="btn btn-info btn-sm action-edit" >
+                                <span class="glyphicon glyphicon-pencil">                                    
+                                </span>
+                            </button>
+                            <button class="btn btn-danger btn-sm action-delete" >
+                                <span class="glyphicon glyphicon-remove">                                    
+                                </span>
+                            </button>
+                        </div>                       
+                        </td>                                                
+                    </tr>
+                @endforeach                
+            </table>                 
+	</div>                           
+    </div>				
+</div>
     
     <div style="display: none;" id="add-product">
         <form role="form">
@@ -121,7 +134,7 @@
         </form>
     </div>    
     
-</div>   
+
 <div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false">
 	<div class="modal-header">
 		<h1>Procesando...</h1>
@@ -131,7 +144,7 @@
                     <div class="bar" style="width: 100%;"></div>
                 </div>
 	</div>
-</div>	
+</div>
 @stop
 
 @section('scripts')
@@ -225,13 +238,14 @@
                     if (!confirm('Desea borrar el Producto?'))
                             return false;
                     $.ajax({
-                            type: "DELETE",
-                            url: '{{ URL::to('/product') }}' + '/' + id,
+                            type: "POST",
+                            url: '{{ URL::to('/product/delete') }}' + '/' + id,
                             success: function(data, textStatus, jqXHR) {                         
                                 dt.fnDraw();
                             },
                             dataType: 'json'
-                    });
+                    });                                      
+                    
                     window.location.reload();
                     window.location.reload();
                     //$("#refresh").click();

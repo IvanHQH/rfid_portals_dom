@@ -24,20 +24,16 @@ Route::post('login', function(){
     else
     {
         $user = User::where('name',Input::get('name'))->take(1)->get();
-        /*if(Auth::id() == $user[0]->id)
-        {}
-        else{*/
-            if($user[0]->password == Input::get('password')){
-                if(Pclient::where('name', Input::get('nameClient'))->count() > 0 ){
-                    Auth::loginUsingId($user[0]->id);
-                    User::setCustomerSelect($user[0]->id, Input::get('nameClient'));
-                    return Redirect::to('ordenesm');                    
-                }else 
-                    return Redirect::to('login');
-            }
-            else
-                return Redirect::to('login');                    
-        //}
+        if($user[0]->password == Input::get('password')){
+            if(Pclient::where('name', Input::get('nameClient'))->count() > 0 ){
+                Auth::loginUsingId($user[0]->id);
+                User::setCustomerSelect($user[0]->id, Input::get('nameClient'));
+                return Redirect::to('ordenesm');                    
+            }else 
+                return Redirect::to('login');
+        }
+        else
+            return Redirect::to('login');                    
     }
 });
 
@@ -58,11 +54,9 @@ Route::post('login_forced', function(){
 });
 
 Route::get('/login', 'HomeController@doLogin');
-Route::post('/test_get_folio', 'HomeController@test_get_folio');
-Route::post('/ordenesmhd', 'OrdenEsMController@storeHandheld');
 Route::resource('ordenesd', 'OrdenEsDController');
 Route::post('/variables/get_var_read', 'HomeController@get_var_read');
-Route::post('/variables/set_no_read', 'HomeController@set_no_read');
+Route::post('/variables/set_no_read', 'VariableController@setReadFalse');
 Route::get('/test', 'HomeController@test');
 Route::resource('ordenesm', 'OrdenEsMController');
 Route::resource('logs', 'EventsLogController');
@@ -74,49 +68,41 @@ Route::resource('pclient', 'PclientController');
 Route::resource('usemode', 'UseModeController');
 Route::get('/logout','HomeController@logout');
 Route::post('/order_pending', 'OrdenEsMController@order_pending');
-Route::post('/update_ordenesd', 'OrdenEsDController@update_ordenesd');
+Route::get('/download_xls/{id}', 'OrdenEsMController@createReadsXls');
 Route::post('/update_ordenesd_v4', 'OrdenEsDController@update_ordenesd_v4');
 Route::resource('sync', 'SyncController');
 Route::post('/sync_data', 'SyncController@index_data');
 Route::post('/sync', 'SyncController@postInventory');
-
-//Route::resource('user', 'UserController');
+Route::post('/getFolio', 'SyncController@getFolio');
 
 Route::group(array('before' => 'auth'), function()
-{    
-    Route::post('/test_get_product', 'HomeController@test_get_product');    
-    Route::post('/add_product', 'HomeController@add_product');
-    Route::get('/variables/set_no_read_portal','HomeController@set_no_read_web');
-
-    Route::get('/upc/data_pending', 'OrdenEsDController@row_data_pending');    
+{       
+    Route::post('/add_product', 'Product@add_product');
+    Route::get('/upc/data_pending', 'OrdenEsDController@ordersd_of_orderm_pending');    
     
-    Route::get('/upc/data/{id?}', 'OrdenEsDController@row_data');    
-    Route::post('/read/start_read_v1', 'OrdenEsDController@start_read_v1');
     Route::post('/read/show_read', 'OrdenEsDController@show_read');
-    Route::post('/read/checkfolio', 'OrdenEsDController@checkfolio');
+    Route::post('/read/check_folio', 'OrdenEsDController@check_folio');
     Route::post('/read/refresh_read', 'OrdenEsDController@refresh_read');
 
     Route::get('/ordenesm',  'OrdenEsMController@getIndex');
     Route::get('/getIndexData',  'OrdenEsMController@getIndexData');
-    Route::get('/showread', 'OrdenEsMController@showread');        
-    Route::get('/dates/lastfolio', 'OrdenEsMController@dateslastfolio');
-    Route::post('/writeJsonFolio', 'OrdenEsMController@writeJsonFolio');
-    Route::post('/writeJsonTags', 'OrdenEsMController@writeJsonTags');
+    Route::get('/folio_capture', 'OrdenEsMController@folio_capture');        
     Route::post('/read/start_read_v4', 'OrdenEsMController@start_read_v4');
     Route::post('/ordenesm/delete/{id}', 'OrdenEsMController@postDelete');
         
-    Route::get('/events_logs/rows_data', 'EventsLogController@rows_data');
-    Route::get('comparison/{id?}', 'EventsLogController@comparison_rows');    
-    //showUseMode
-    Route::get('showUseMode/{id?}', 'OrdenEsDController@showUseMode');
+    Route::get('excess_missing_order/{id?}', 'EventsLogController@excess_missing_order');    
+
+    Route::get('showAssetsUseMode/{id?}', 'OrdenEsDController@showAssetsUseMode');
     Route::resource('product', 'ProductController');
     Route::post('/product/index', 'ProductController@index');
     Route::post('/product/{id?}', 'ProductController@store');
-    Route::get('/product/get/{id}', 'ProductController@getProduct');    
+    Route::get('/product/get/{id}', 'ProductController@getProduct');   
+    Route::post('/product/delete/{id}', 'ProductController@postDelete'); 
     
     Route::resource('warehouse', 'WarehouseController');
     Route::post('/warehouse/{id?}', 'WarehouseController@store');
-    Route::get('/warehouse/get/{id}', 'WarehouseController@getWarehouse');    
+    Route::get('/warehouse/get/{id}', 'WarehouseController@getWarehouse');  
+    Route::post('/warehouse/delete/{id?}', 'WarehouseController@postDelete');
 
     Route::get('/arching_inv_init', 'ArchingController@Inventory_Initial');
     Route::get('/arching_inv_end/{id?}', 'ArchingController@Inventory_End');
@@ -125,16 +111,6 @@ Route::group(array('before' => 'auth'), function()
     
     Route::post('/upload/{inventories?}','ArchingController@upload_file');
     
-    /*Route::post('/upload/{id?}', function($id){
-         if(Input::hasFile('archivo')) {
-             if (Input::file('archivo')->isValid())
-             { 
-                echo $id;die();
-                $path = Input::file('archivo')->getRealPath(); 
-                Input::file('archivo')->move('/home/developer/Projects/RFID/laravel/public/','calibrate.txt');
-                //echo $path;die();
-             }             
-         }
-         link_to(URL::previous());         
-    });  */  
+    Route::get('/rpt_excess/{params?}','AssetsInventoryController@rpt_excess');
+    Route::get('/rpt_missing/{params?}','AssetsInventoryController@rpt_missing');
 });

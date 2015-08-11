@@ -12,7 +12,7 @@
  * @author Arellano
  */
 class EventsLog extends BaseModel {
-     public function User()
+    public function User()
     {
         return $this->belongsTo('User');
     }
@@ -46,5 +46,10 @@ class EventsLog extends BaseModel {
             $log->pclient_id = Auth::user()->pclient_id;
             $log->save();
         }
-    }   
+    }    
+    
+    public function ExcessMissingStringToArrays()
+    {
+        
+    }
 }

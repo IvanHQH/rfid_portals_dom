@@ -28,7 +28,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
     {
         $result = "";
         $users = User::all();
-        $readsUpcs = OrdenEsD::UPCsPending($idClient);
+        $readsUpcs = OrdenEsD::assetsCurrentReading($idClient);
         //return Response::json($users);
         foreach ($users as $user){
             foreach ($readsUpcs as $upcRead){
